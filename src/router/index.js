@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Layout from '../layout/layout.vue'
 import Index from '../views/login/index.vue'
+import Profile from '../profile/info.vue'
 import Welcome from '../components/welcome.vue'
 import UserTeacher from '../views/user/userTeacher.vue'
 import AddUser from '../views/user/addUser.vue'
@@ -17,9 +18,20 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/login',
+    path: '/',
     name: 'index',
     component: Index
+  },
+  {
+    path: '/profile/info',
+    component: Layout,
+    children: [
+      {
+        path: '/profile/info',
+        component: Profile
+      }
+    ]
+
   },
   {
     path: '/dashboard',

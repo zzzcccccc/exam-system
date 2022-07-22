@@ -19,24 +19,24 @@
         <el-table-column prop="role" label="角色标识"/>
         <el-table-column prop="roleName" label="角色名称"/>
         <el-table-column prop="createTime" label="创建时间"/>
-        <el-table-column label="操作" width="300px">
+        <el-table-column label="操作" width="280px">
             <template slot-scope="scope">
                 <!-- 放置修改、删除和分配角色按钮  -->
                 <!--  鼠标放上去会提示内容标签 <el-tooltip effect="dark" content="删除" placement="top"></el-tooltip> -->
-                <el-button type="warning" icon="el-icon-setting" size="mini"  @click="showRole(scope.row)" >分配权限</el-button>
+                <el-button type="warning" icon="el-icon-setting" size="mini"  @click="showMenu(scope.row)" >权限</el-button>
                 <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row)">修改</el-button>
                 <el-button type="danger" icon="el-icon-delete" size="mini" @click="delRole(scope.row)">删除</el-button>
             </template>
         </el-table-column>
       </el-table>
     </el-card>
-    <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%" >
+    <el-dialog title="分配目录" :visible.sync="setMenuDialogVisible" width="50%" >
       <!-- 树形组件 -->
-        <el-tree :data="rightsList" :props="treeProps" show-checkbox default-expand-all
-          node-key="id" :default-checked-keys="defkeys"  ref="treeRef" ></el-tree>
+        <el-tree :data="menuList" :props="menuTreeProps" show-checkbox default-expand-all
+          node-key="id" :default-checked-keys="menuDefkeys"  ref="menuDefkeys" ></el-tree>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="setRightDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editRolePermission()">确 定</el-button>
+        <el-button @click="setMenuDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editRoleMenu()">确 定</el-button>
       </span>
     </el-dialog>
     <el-dialog title="修改角色" :visible.sync="editDialogVisible" width="50%" >
@@ -77,20 +77,20 @@ export default {
   data () {
     return {
       list: [],
+      flag: 0,
       listLoading: true,
       // 控制分配权限对话框的显示与隐藏
-      setRightDialogVisible: false,
+      setMenuDialogVisible: false,
       editDialogVisible: false,
       addDialogVisible: false,
-      // 所有权限的数据
-      rightsList: [],
-      // 树形控件的属性绑定对象
-      treeProps: {
-        label: 'permissionName',
+      // 所有目录的数据
+      menuList: [],
+      menuTreeProps: {
+        label: 'name',
         children: 'children'
       },
-      // 默认选中的权限ID数组对象
-      defkeys: [],
+      menuDefkeys: [],
+
       roleId: 0,
       roleForm: {
         id: 0,
@@ -126,38 +126,37 @@ export default {
         this.listLoading = false
       })
     },
-    showRole (row) {
+    showMenu (row) {
       this.roleId = row.id
-      this.$http.get('/system/getAllPermission')
+      this.$http.get('/menu/getAll/' + this.flag)
         .then(result => {
           if (result.data.code === 0) {
-            this.rightsList = result.data.data
+            this.menuList = result.data.data
           } else {
             this.$message.error('获取权限数据失败！')
           }
         })
       // 角色ID row.id
-      this.defkeys = [] // 清空已选权限
-      this.$http.get('/system/getUsePermissionByRoleId/' + row.id)
+      this.menuDefkeys = [] // 清空已选权限
+      this.$http.get('/menu/getRoleMenuByRoleId/' + this.roleId)
         .then(result => {
           if (result.data.code === 0) {
-            this.defkeys = result.data.data
-            this.setRightDialogVisible = true
+            this.menuDefkeys = result.data.data
+            this.setMenuDialogVisible = true
           } else {
             this.$message.error('获取权限数据失败！')
           }
         })
     },
-    editRolePermission () {
+    editRoleMenu () {
       // "..."为“展开运算符”，将一个数组转为用逗号分隔的参数序列
       const keys = [
-        ...this.$refs.treeRef.getCheckedKeys()
-        // ...this.$refs.treeRef.getHalfCheckedKeys() // 半选中的节点(父类的Id)
+        ...this.$refs.menuDefkeys.getCheckedKeys()
+        // ...this.$refs.menuDefkeys.getHalfCheckedKeys() // 半选中的节点(父类的Id)
       ]
-      console.log(keys)
-      this.$http.put('/system/editRolePermission/', {
+      this.$http.put('/menu/editRoleMenu/', {
         roleId: this.roleId,
-        permissionIds: keys
+        menuIds: keys
       })
         .then(result => {
           if (result.data.code === 0) {
@@ -169,7 +168,7 @@ export default {
           }
         })
 
-      this.setRightDialogVisible = false
+      this.setMenuDialogVisible = false
     },
     showEditDialog (row) {
       this.roleForm = row

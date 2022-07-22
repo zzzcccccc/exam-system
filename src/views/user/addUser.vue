@@ -31,7 +31,7 @@
       <el-form-item label="手机：">
         <el-input v-model="form.phone"></el-input>
       </el-form-item>
-      <el-form-item label="状态：" required>
+      <el-form-item label="状态：" prop="status">
         <el-select v-model="form.status" placeholder="状态">
           <el-option v-for="item in statusEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
         </el-select>
@@ -73,6 +73,9 @@ export default {
         ],
         age: [
           { pattern: /^[0-9]*$/, message: '年龄必须是数字' }
+        ],
+        status: [
+          { required: true, message: '请选择状态', trigger: 'blur' }
         ]
       },
       sexEnum: [

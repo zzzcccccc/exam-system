@@ -13,7 +13,7 @@
               <i class="el-icon-caret-bottom" />
             </div>
             <el-dropdown-menu slot="dropdown">
-              <router-link to="/profile/index">
+              <router-link to="/profile/info/">
                 <el-dropdown-item>个人信息</el-dropdown-item>
               </router-link>
               <router-link to="/dashboard">
@@ -35,21 +35,21 @@
             :collapse="isCollapse" :collapse-transition="false"
             :router="true" :default-active="activePath">
                <!-- 一级菜单 -->
-               <el-submenu :index="item.id+''" v-for="item in menuList" :key="item.id">
+               <el-submenu :index="item.menuId+''" v-for="item in menuList" :key="item.menuId">
                <!-- 一级菜单的模板区域 -->
                <template slot="title">
                    <!-- 图标 -->
                   <i :class= item.icon></i>
                   <!-- 菜单名称 -->
-                  <span>{{item.authName}}</span>
+                  <span>{{item.name}}</span>
                </template>
-          <span v-for="subItem in item.children" :key="subItem.id">
+          <span v-for="subItem in item.children" :key="subItem.menuId">
             <span v-if="subItem.children ==undefined || subItem.children.length <= 0">
               <el-menu-item :index="'/'+subItem.path"
                 @click="saveNavState('/'+subItem.path)">
                   <template slot="title">
                     <i :class=subItem.icon></i>
-                    <span slot="title">{{subItem.authName}}</span>
+                    <span slot="title">{{subItem.name}}</span>
                   </template>
               </el-menu-item>
             </span>
@@ -58,13 +58,13 @@
                 <!-- 二级菜单的模板区域 -->
                 <template slot="title">
                     <i :class= subItem.icon></i>
-                    <span>{{subItem.authName}}</span>
+                    <span>{{subItem.name}}</span>
                 </template>
-                <el-menu-item :index="'/'+subItem.path+'/'+thrItem.path" v-for="thrItem in subItem.children" :key="thrItem.id"
+                <el-menu-item :index="'/'+subItem.path+'/'+thrItem.path" v-for="thrItem in subItem.children" :key="thrItem.menuId"
                   @click="saveNavState('/'+subItem.path+'/'+thrItem.path)">
                   <template slot="title">
                     <i :class=thrItem.icon></i>
-                    <span slot="title">{{thrItem.authName}}</span>
+                    <span slot="title">{{thrItem.name}}</span>
                   </template>
                 </el-menu-item>
               </el-submenu>
@@ -90,7 +90,8 @@ export default {
       menuList: [],
       isCollapse: false,
       activePath: '', // 被激活的菜单
-      username: this.$cookie.get('userName')
+      username: this.$cookie.get('userName'),
+      flag: 1 // 1目录 2按钮
     }
   },
   created () {
@@ -103,7 +104,7 @@ export default {
     },
     // 获取所有的菜单
     async getMenuList () {
-      const { data: res } = await this.$http.get('/menu/getAll')
+      const { data: res } = await this.$http.get('/menu/getAll/' + this.flag)
       if (res.code !== 0) {
         return this.$message.error(res.msg)
       } else {

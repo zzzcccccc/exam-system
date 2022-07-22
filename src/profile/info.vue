@@ -1,19 +1,13 @@
 <template>
-  <div class="app-container">
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '' }">用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/user/teacherInfo' }">用户列表</el-breadcrumb-item>
-      <el-breadcrumb-item>用户编辑</el-breadcrumb-item>
-    </el-breadcrumb>
-    <el-form :model="form" ref="form" label-width="100px" :rules="rules">
-      <el-form-item label="用户名："  prop="userName" required>
+  <div>
+       <el-form :model="form" ref="form" label-width="100px" :rules="rules">
+      <el-form-item label="用户名："  prop="userName">
         <el-input v-model="form.userName"></el-input>
       </el-form-item>
-      <el-form-item label="密码：" prop="password" required>
+      <el-form-item label="密码：" prop="password">
         <el-input v-model="form.password"></el-input>
       </el-form-item>
-      <el-form-item label="真实姓名：" prop="realName"   required>
+      <el-form-item label="真实姓名：" prop="realName">
         <el-input v-model="form.realName"></el-input>
       </el-form-item>
       <el-form-item label="年龄：">
@@ -30,23 +24,24 @@
       <el-form-item label="手机：">
         <el-input v-model="form.phone"></el-input>
       </el-form-item>
-      <el-form-item label="状态：" prop="staus">
+      <el-form-item label="状态：" prop="status" >
         <el-select v-model="form.status" placeholder="状态">
           <el-option v-for="item in statusEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">提交</el-button>
-        <el-button  @click="restForm">重置</el-button>
         <el-button @click="getBack">返回</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
+
 <script>
 export default ({
   data () {
     return {
+      username: this.$cookie.get('userName'),
       form: {
         id: null,
         userName: '',
@@ -98,7 +93,7 @@ export default ({
     }
   },
   created () {
-    this.$http.get('user/getInfoById/' + this.$route.query.id)
+    this.$http.get('user/getInfoByUsername/' + this.username)
       .then(result => {
         if (result.data.code === 0) {
           this.form = result.data.data
@@ -122,19 +117,6 @@ export default ({
           return false
         }
       })
-    },
-    restForm () {
-      this.form = {
-        id: null,
-        userName: '',
-        password: '',
-        realName: '',
-        status: null,
-        age: '',
-        sex: null,
-        birthDay: null,
-        phone: null
-      }
     },
     getBack () {
       this.$router.back()

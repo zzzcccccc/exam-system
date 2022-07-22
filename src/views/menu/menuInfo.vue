@@ -3,8 +3,8 @@
    <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>目录管理</el-breadcrumb-item>
-      <el-breadcrumb-item>目录列表</el-breadcrumb-item>
+      <el-breadcrumb-item>系统管理</el-breadcrumb-item>
+      <el-breadcrumb-item>菜单列表</el-breadcrumb-item>
     </el-breadcrumb>
      <!-- 卡片视图 -->
       <el-card>
@@ -27,9 +27,12 @@
           :selection-type="false"
         >
            <!-- 是否有效 -->
-          <template slot="isok" slot-scope="scope">
-           <el-tag :type="(scope.row.showFlag == '0' ? 'success' :  'danger')">
-                {{ scope.row.showFlag == '0' ? '显示' : '隐藏'}}
+           <template slot="isok" scope="scope">
+            <el-tag type="primary" effect="plain" size="mini" v-if="scope.row.showFlag == 1">
+            菜单
+            </el-tag>
+            <el-tag type="success" effect="plain" size="mini" v-else-if="scope.row.showFlag == 2">
+            按钮
             </el-tag>
           </template>
           <!-- 排序 -->
@@ -44,32 +47,36 @@
           </template>
           <!-- 操作 -->
           <template slot="opt" slot-scope="scope">
-            <el-button type="success" icon="el-icon-plus" size="mini" @click="openadd(scope.row)">
-            新增
-            </el-button>
-            <el-button type="primary" icon="el-icon-edit" size="mini" @click="openedit(scope.row)">
-            编辑
-            </el-button>
-            <el-button type="danger" icon="el-icon-delete" size="mini" @click="opendel(scope.row)">
-            删除
-            </el-button>
+            <el-tooltip effect="dark" content="添加" placement="top">
+              <el-button type="success" icon="el-icon-plus" size="mini" @click="openadd(scope.row)"/>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="编辑" placement="top">
+              <el-button type="primary" icon="el-icon-edit" size="mini" @click="openedit(scope.row)"/>
+            </el-tooltip>
+             <el-tooltip effect="dark" content="删除" placement="top">
+              <el-button type="danger" icon="el-icon-delete" size="mini" @click="opendel(scope.row)"/>
+            </el-tooltip>
+
           </template>
         </tree-table>
       </el-card>
       <!-- 添加分类表单 -->
-      <el-dialog title="添加分类" :visible.sync="addDialogVisible" width="50%" >
+      <el-dialog title="添加" :visible.sync="addDialogVisible" width="50%" >
       <el-form :model="cateForm"
       ref="cateForm" label-width="100px" :rules="cateFormRules">
-        <el-form-item label="目录名称" prop="authName" >
-            <el-input v-model="cateForm.authName"></el-input>
+        <el-form-item label="菜单名称" prop="name" >
+            <el-input v-model="cateForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="权限标识" prop="permission" >
+            <el-input v-model="cateForm.permission"></el-input>
         </el-form-item>
         <el-form-item label="访问路径" prop="path">
             <el-input v-model="cateForm.path"></el-input>
         </el-form-item>
-        <el-form-item label="目录icon">
+        <el-form-item label="菜单icon">
             <el-input v-model="cateForm.icon"></el-input>
         </el-form-item>
-        <el-form-item label="状态" prop="showFlag"  required>
+        <el-form-item label="菜单类型" prop="showFlag"  required>
           <el-select v-model="cateForm.showFlag" placeholder="状态">
           <el-option v-for="item in statusEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
           </el-select>
@@ -92,19 +99,22 @@
       </span>
     </el-dialog>
     <!-- 编辑分类表单 -->
-      <el-dialog title="编辑分类" :visible.sync="editDialogVisible" width="50%" >
+      <el-dialog title="编辑" :visible.sync="editDialogVisible" width="50%" >
       <el-form :model="editCateForm"
       ref="editCateForm" label-width="100px" :rules="cateFormRules">
-        <el-form-item label="目录名称" prop="authName" >
-            <el-input v-model="editCateForm.authName"></el-input>
+        <el-form-item label="菜单名称" prop="name" >
+            <el-input v-model="editCateForm.name"></el-input>
+        </el-form-item>
+         <el-form-item label="权限标识" prop="permission" >
+            <el-input v-model="editCateForm.permission" style="width: 100%;outline: none;height: 100%" disabled></el-input>
         </el-form-item>
         <el-form-item label="访问路径" prop="path" >
             <el-input v-model="editCateForm.path" style="width: 100%;outline: none;height: 100%" disabled></el-input>
         </el-form-item>
-        <el-form-item label="目录icon">
+        <el-form-item label="菜单icon">
             <el-input v-model="editCateForm.icon"></el-input>
         </el-form-item>
-        <el-form-item label="状态" prop="showFlag"  required>
+        <el-form-item label="菜单类型" prop="showFlag">
           <el-select v-model="editCateForm.showFlag" placeholder="状态">
           <el-option v-for="item in statusEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
           </el-select>
@@ -133,15 +143,17 @@ export default {
   data () {
     return {
       columns: [
-        { label: '目录名称', prop: 'authName', width: '150px' },
-        { label: '访问路径', prop: 'path' },
-        { label: '目录icon', prop: 'icon' },
+        { label: '菜单名称', prop: 'name', width: '150px' },
+        { label: '权限标识', prop: 'permission' },
+        { label: '访问路径', prop: 'path', width: '150px' },
+        { label: '菜单icon', prop: 'icon', width: '130px' },
         { label: '描述', prop: 'detail' },
-        { label: '状态', prop: 'showFlag', type: 'template', template: 'isok', width: '80px' },
-        { label: '等级', prop: 'level', type: 'template', template: 'level' },
+        { label: '菜单类型', prop: 'showFlag', type: 'template', template: 'isok', width: '60' },
+        { label: '等级', prop: 'level', type: 'template', template: 'level', width: '60' },
         { label: '创建时间', prop: 'createTime' },
-        { label: '操作', type: 'template', width: '280px', template: 'opt' }
+        { label: '操作', type: 'template', width: '180', template: 'opt' }
       ],
+      flag: 0, // 1目录 2按钮 0全部
       categoriesdata: [],
       addDialogVisible: false,
       editDialogVisible: false,
@@ -152,8 +164,8 @@ export default {
       options: [],
       // 指定级联选择器的配置对象
       cascaderProps: {
-        value: 'id',
-        label: 'authName',
+        value: 'menuId',
+        label: 'name',
         children: 'children',
         expandTrigger: 'hover', // 悬浮显示
         checkStrictly: true // 可以选择任一级选项
@@ -163,20 +175,23 @@ export default {
           { required: true, message: '请输入访问路径', trigger: 'blur' },
           { pattern: /^[^\u4e00-\u9fa5]+$/, message: '不能包含汉字' }
         ],
-        authName: [
+        name: [
           { required: true, message: '请输入目录名称', trigger: 'blur' }
         ],
+        permission: [
+          { required: true, message: '请输入权限标识', trigger: 'blur' }
+        ],
         showFlag: [
-          { required: true, message: '请选择状态', trigger: 'blur' }
+          { required: true, message: '请选择菜单类型', trigger: 'blur' }
         ]
       },
       statusEnum: [
         {
-          key: '0',
-          value: '展示'
+          key: 1,
+          value: '菜单'
         }, {
-          key: '1',
-          value: '隐藏'
+          key: 2,
+          value: '按钮'
         }
       ]
     }
@@ -188,11 +203,10 @@ export default {
   methods: {
     getMenuAll () {
       this.options = []
-      this.$http.get('/menu/getAll')
+      this.$http.get('/menu/getAll/' + this.flag)
         .then(result => {
           if (result.data.code === 0) {
             this.categoriesdata = result.data.data
-            // this.options = result.data.data
           } else {
             this.$message.error('获取权限数据失败！')
           }
@@ -241,7 +255,7 @@ export default {
       if (row.parentId !== -1) {
         this.value.push(row.parentId)
       }
-      this.value.push(row.id)
+      this.value.push(row.menuId)
       this.cateForm.value = this.value // 回显子类的名称
       this.addDialogVisible = true
     },
@@ -291,12 +305,13 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http.delete('/menu/delMenu/' + row.id + '/' + row.parentId)
+        this.$http.delete('/menu/delMenu/' + row.menuId + '/' + row.level)
           .then(result => {
             if (result.data.code === 0) {
               this.$message.success(result.data.msg)
               this.getMenuAll()
             } else {
+              this.getMenuAll()
               this.$message.error(result.data.msg)
             }
           })
