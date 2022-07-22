@@ -295,8 +295,7 @@ export default {
           .then(result => {
             if (result.data.code === 0) {
               this.$message.success(result.data.msg)
-              // 重新获取用户列表数据
-              this.getPermissionAll()
+              this.getMenuAll()
             } else {
               this.$message.error(result.data.msg)
             }
