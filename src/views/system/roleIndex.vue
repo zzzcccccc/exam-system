@@ -30,10 +30,10 @@
         </el-table-column>
       </el-table>
     </el-card>
-    <el-dialog title="分配权限" :visible.sync="setMenuDialogVisible" width="50%" >
+    <el-dialog title="分配目录" :visible.sync="setMenuDialogVisible" width="50%" >
       <!-- 树形组件 -->
         <el-tree :data="menuList" :props="menuTreeProps" show-checkbox default-expand-all
-          node-key="menuId" :default-checked-keys="menuDefkeys"  ref="menuDefkeys" ></el-tree>
+          node-key="id" :default-checked-keys="menuDefkeys"  ref="menuDefkeys" ></el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setMenuDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="editRoleMenu()">确 定</el-button>
@@ -151,10 +151,9 @@ export default {
     editRoleMenu () {
       // "..."为“展开运算符”，将一个数组转为用逗号分隔的参数序列
       const keys = [
-        ...this.$refs.menuDefkeys.getCheckedKeys(),
-        //...this.$refs.menuDefkeys.getHalfCheckedKeys() // 半选中的节点(父类的Id)
+        ...this.$refs.menuDefkeys.getCheckedKeys()
+        // ...this.$refs.menuDefkeys.getHalfCheckedKeys() // 半选中的节点(父类的Id)
       ]
-      console.log(keys)
       this.$http.put('/menu/editRoleMenu/', {
         roleId: this.roleId,
         menuIds: keys

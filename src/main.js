@@ -6,6 +6,8 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/css/all.css' // 全局css 页面撑满
 import TreeTable from 'vue-table-with-tree-grid'
+import store from './store'
+
 // 配置cookie
 import cookie from 'vue-cookie'
 
@@ -21,13 +23,43 @@ axios.defaults.timeout = 5000 // 单位是毫秒
 axios.defaults.withCredentials = true
 axios.defaults.baseURL = '/api'
 axios.defaults.headers.post['Content-Type'] = 'application/json'
-// axios请求拦截
-axios.interceptors.request.use(config => {
-  // 为请求头对象，添加Token验证的Authorization字段
-  config.headers.Authorization = window.sessionStorage.getItem('token')
-  return config
-})
+
+// 添加请求拦截器，若token存在则在请求头中加token，不存在也继续请求
+axios.interceptors.request.use(
+  config => {
+    // 每次发送请求之前都检测vuex是否存有token,放在请求头发送给服务器
+    // Authorization是根据后端自定义字段
+    config.headers.Authorization = store.getters.getToken
+    return config
+  },
+  error => {
+    console.log('在request拦截器显示错误：', error.response)
+    return Promise.reject(error)
+  }
+)
+
+// http response 拦截器
+axios.interceptors.response.use(
+  response => {
+    return response
+  },
+  error => {
+    if (error.response) {
+      switch (error.response.status) {
+        case 401:
+          store.commit('delToken')
+          router.replace({
+            path: '/',
+            query: { redirect: router.currentRoute.fullPath }// 登录成功后跳入浏览的当前页面
+          })
+          break
+      }
+    }
+    return Promise.reject(error.response.data)
+  })
+
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

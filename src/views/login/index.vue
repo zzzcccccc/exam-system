@@ -60,6 +60,8 @@ export default {
             this.$message.success(res.data.msg)
             this.$cookie.set('userName', this.loginForm.userName)
             this.$router.push({ path: '/dashboard' })
+            // this.$store.commit('setToken', res.data.data.tokenValue)
+            localStorage.setItem('token', JSON.stringify(res.data.data.tokenValue))
           } else {
             this.$message.error(res.data.msg)
           }

@@ -99,7 +99,8 @@ export default {
   },
   methods: {
     logout () {
-      window.sessionStorage.clear()
+      // window.sessionStorage.clear()
+      localStorage.clear()
       this.$router.push('/')
     },
     // 获取所有的菜单
