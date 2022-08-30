@@ -59,9 +59,11 @@ export default {
           if (res.data.code === 0) {
             this.$message.success(res.data.msg)
             this.$cookie.set('userName', this.loginForm.userName)
+            this.$cookie.set('loginId', res.data.data.loginId)
             this.$router.push({ path: '/dashboard' })
-            // this.$store.commit('setToken', res.data.data.tokenValue)
-            localStorage.setItem('token', JSON.stringify(res.data.data.tokenValue))
+            console.log('登录入口')
+            this.$store.commit('setToken', res.data.data.tokenValue)
+            // localStorage.setItem('token', JSON.stringify(res.data.data.tokenValue))
           } else {
             this.$message.error(res.data.msg)
           }

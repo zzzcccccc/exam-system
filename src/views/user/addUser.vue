@@ -48,6 +48,7 @@
 export default {
   data () {
     return {
+      tokenFail: this.$store.state.tokenFail,
       form: {
         id: null,
         userName: '',
@@ -107,6 +108,10 @@ export default {
               if (result.data.code === 0) {
                 this.$message.success(result.data.msg)
                 this.$router.back()
+              } else if (result.data.code === this.tokenFail) {
+                this.$message.error(result.data.msg)
+                this.$store.commit('delToken')
+                this.$router.push('/')
               } else {
                 this.$message.error(result.data.msg)
               }

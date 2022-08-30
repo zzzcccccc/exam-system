@@ -38,6 +38,7 @@
 export default {
   data () {
     return {
+      tokenFail: this.$store.state.tokenFail,
       permissionId: 0,
       rightsList: [],
       setAddPermissionDialogVisible: false,
@@ -70,6 +71,10 @@ export default {
         .then(result => {
           if (result.data.code === 0) {
             this.rightsList = result.data.data
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
             this.$message.error('获取权限数据失败！')
           }
@@ -89,6 +94,10 @@ export default {
                 this.$message.success(result.data.msg)
                 this.getPermissionAll()
                 this.setAddPermissionDialogVisible = false
+              } else if (result.data.code === this.tokenFail) {
+                this.$message.error(result.data.msg)
+                this.$store.commit('delToken')
+                this.$router.push('/')
               } else {
                 this.$message.error(result.data.msg)
               }

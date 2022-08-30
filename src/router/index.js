@@ -113,15 +113,19 @@ const router = new VueRouter({
 
 // 设置路由守卫，在进页面之前，判断有token，才进入页面，否则返回登录页面
 if (storage.get('token')) {
+  console.log('设置路由守卫，在进页面之前，判断有token，才进入页面，否则返回登录页面')
   store.commit('setToken', storage.get('token'))
 }
 router.beforeEach((to, from, next) => {
   // 判断要去的路由有没有requiresAuth
   // to.matched.some(r => r.meta.requireAuth) or to.meta.requiresAuth
   if (to.matched.some(r => r.meta.requireAuth)) {
+    console.log(4444)
     if (store.state.token) {
+      console.log(1111)
       next() // 有token,进行request请求，后台还会验证token
     } else {
+      console.log(2222)
       next({
         path: '/',
         // 将刚刚要去的路由path（却无权限）作为参数，方便登录成功后直接跳转到该路由，这要进一步在登陆页面判断
@@ -129,6 +133,7 @@ router.beforeEach((to, from, next) => {
       })
     }
   } else {
+    console.log(3333)
     next() // 如果无需token,那么随它去吧
   }
 })

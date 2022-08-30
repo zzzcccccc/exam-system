@@ -2,10 +2,7 @@
 
 var storage = {
   set (key, value) {
-    console.log(2222)
-    localStorage.setItem(key, value)
-    // localStorage.key = value;
-    // localStorage[key] = value;
+    localStorage.setItem(key, JSON.stringify(value))
   },
   get (key) {
     return JSON.parse(localStorage.getItem(key))

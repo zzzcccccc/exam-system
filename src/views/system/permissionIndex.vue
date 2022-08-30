@@ -117,6 +117,7 @@
 export default {
   data () {
     return {
+      tokenFail: this.$store.state.tokenFail,
       columns: [
         { label: '权限名称', prop: 'permissionName' },
         {
@@ -177,6 +178,10 @@ export default {
         .then(result => {
           if (result.data.code === 0) {
             this.categoriesdata = result.data.data
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
             this.$message.error('获取权限数据失败！')
           }
@@ -192,6 +197,10 @@ export default {
         .then(result => {
           if (result.data.code === 0) {
             this.options = result.data.data
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
             this.$message.error('获取权限数据失败！')
           }
@@ -206,6 +215,10 @@ export default {
                 this.$message.success(result.data.msg)
                 this.getPermissionAll()
                 this.addDialogVisible = false
+              } else if (result.data.code === this.tokenFail) {
+                this.$message.error(result.data.msg)
+                this.$store.commit('delToken')
+                this.$router.push('/')
               } else {
                 this.$message.error(result.data.msg)
               }
@@ -228,6 +241,10 @@ export default {
               if (result.data.code === 0) {
                 this.$message.success(result.data.msg)
                 this.getPermissionAll()
+              } else if (result.data.code === this.tokenFail) {
+                this.$message.error(result.data.msg)
+                this.$store.commit('delToken')
+                this.$router.push('/')
               } else {
                 this.$message.error(result.data.msg)
               }
@@ -250,6 +267,10 @@ export default {
               this.$message.success(result.data.msg)
               // 重新获取用户列表数据
               this.getPermissionAll()
+            } else if (result.data.code === this.tokenFail) {
+              this.$message.error(result.data.msg)
+              this.$store.commit('delToken')
+              this.$router.push('/')
             } else {
               this.$message.error(result.data.msg)
             }

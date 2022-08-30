@@ -78,6 +78,7 @@
 export default {
   data () {
     return {
+      tokenFail: this.$store.state.tokenFail,
       queryInfo: {
         current: 1,
         size: 10,
@@ -115,6 +116,10 @@ export default {
           this.list = res.records
           this.total = res.total
           this.listLoading = false
+        } else if (result.data.code === this.tokenFail) {
+          this.$message.error(result.data.msg)
+          this.$store.commit('delToken')
+          this.$router.push('/')
         } else {
           this.$message.error('查询失败')
         }

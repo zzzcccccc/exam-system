@@ -78,6 +78,7 @@
 export default {
   data () {
     return {
+      tokenFail: this.$store.state.tokenFail,
       queryInfo: {
         current: 1,
         size: 10,
@@ -115,6 +116,10 @@ export default {
           this.list = res.records
           this.total = res.total
           this.listLoading = false
+        } else if (result.data.code === this.tokenFail) {
+          this.$message.error(result.data.msg)
+          this.$store.commit('delToken')
+          this.$router.push('/')
         } else {
           this.$message.error('查询失败')
         }
@@ -157,6 +162,10 @@ export default {
               this.$message.success('删除成功')
               // 重新获取用户列表数据
               this.listAllBlog()
+            } else if (result.data.code === this.tokenFail) {
+              this.$message.error(result.data.msg)
+              this.$store.commit('delToken')
+              this.$router.push('/')
             } else {
               this.$message.error('删除失败')
             }
@@ -171,6 +180,10 @@ export default {
         .then(result => {
           if (result.data.code === 0) {
             this.tableData = result.data.data
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
             this.$message.error('获取角色数据失败！')
           }
@@ -180,6 +193,10 @@ export default {
           if (result.data.code === 0) {
             this.chooseRoleNames = result.data.data
             this.setRightDialogVisible = true
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
             this.$message.error('获取角色数据失败！')
           }
@@ -209,6 +226,10 @@ export default {
             this.$message.success('分配成功')
             // 重新获取用户列表数据
             this.listAllBlog()
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
             this.setRightDialogVisible = false
             this.$message.success('分配失败')

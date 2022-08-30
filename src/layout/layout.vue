@@ -86,8 +86,10 @@
 export default {
   data () {
     return {
+      tokenFail: this.$store.state.tokenFail,
       // 左侧菜单数据
       menuList: [],
+      loginId: this.$cookie.get('loginId'),
       isCollapse: false,
       activePath: '', // 被激活的菜单
       username: this.$cookie.get('userName'),
@@ -100,14 +102,22 @@ export default {
   methods: {
     logout () {
       // window.sessionStorage.clear()
-      localStorage.clear()
-      this.$router.push('/')
+      this.$http.get('/user/logOut/' + this.loginId)
+        .then(result => {
+          if (result.data.code === 0 || result.data.code === this.tokenFail) {
+            this.$message.success('操作成功！')
+            this.$store.commit('delToken')
+            this.$router.push('/')
+          } else {
+            this.$message.error('操作失败！')
+          }
+        })
     },
     // 获取所有的菜单
     async getMenuList () {
       const { data: res } = await this.$http.get('/menu/getAll/' + this.flag)
       if (res.code !== 0) {
-        return this.$message.error(res.msg)
+        return this.$message.success(res.msg)
       } else {
         this.menuList = res.data
       }

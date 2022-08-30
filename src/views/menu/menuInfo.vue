@@ -142,6 +142,7 @@
 export default {
   data () {
     return {
+      tokenFail: this.$store.state.tokenFail,
       columns: [
         { label: '菜单名称', prop: 'name', width: '150px' },
         { label: '权限标识', prop: 'permission' },
@@ -205,10 +206,15 @@ export default {
       this.options = []
       this.$http.get('/menu/getAll/' + this.flag)
         .then(result => {
+          console.log(result.data.code)
           if (result.data.code === 0) {
             this.categoriesdata = result.data.data
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
-            this.$message.error('获取权限数据失败！')
+            this.$message.error(result.data.msg)
           }
         })
     },
@@ -218,8 +224,12 @@ export default {
         .then(result => {
           if (result.data.code === 0) {
             this.options = result.data.data
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
-            this.$message.error('获取权限数据失败！')
+            this.$message.error(result.data.msg)
           }
         })
     },
@@ -240,6 +250,10 @@ export default {
                 this.$message.success(result.data.msg)
                 this.getMenuAll()
                 this.addDialogVisible = false
+              } else if (result.data.code === this.tokenFail) {
+                this.$message.error(result.data.msg)
+                this.$store.commit('delToken')
+                this.$router.push('/')
               } else {
                 this.$message.error(result.data.msg)
               }
@@ -290,6 +304,10 @@ export default {
                 this.$message.success(result.data.msg)
                 this.getMenuAll()
                 this.editDialogVisible = false
+              } else if (result.data.code === this.tokenFail) {
+                this.$message.error(result.data.msg)
+                this.$store.commit('delToken')
+                this.$router.push('/')
               } else {
                 this.$message.error(result.data.msg)
               }
@@ -310,6 +328,10 @@ export default {
             if (result.data.code === 0) {
               this.$message.success(result.data.msg)
               this.getMenuAll()
+            } else if (result.data.code === this.tokenFail) {
+              this.$message.error(result.data.msg)
+              this.$store.commit('delToken')
+              this.$router.push('/')
             } else {
               this.getMenuAll()
               this.$message.error(result.data.msg)

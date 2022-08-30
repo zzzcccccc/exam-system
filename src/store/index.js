@@ -10,12 +10,15 @@ const store = new Vuex.Store({
   state: {
     // 存储token
     token: '',
-    userName: '' // 可选
+    tokenFail: 401 // 可选
   },
 
   getters: {
     getToken (state) {
       return state.token || storage.get('token') || ''
+    },
+    getTokenFail (state) {
+      return state.tokenFail
     }
   },
 

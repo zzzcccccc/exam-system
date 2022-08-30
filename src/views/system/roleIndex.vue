@@ -33,7 +33,7 @@
     <el-dialog title="分配目录" :visible.sync="setMenuDialogVisible" width="50%" >
       <!-- 树形组件 -->
         <el-tree :data="menuList" :props="menuTreeProps" show-checkbox default-expand-all
-          node-key="id" :default-checked-keys="menuDefkeys"  ref="menuDefkeys" ></el-tree>
+          node-key="menuId" :default-checked-keys="menuDefkeys"  ref="menuDefkeys" ></el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setMenuDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="editRoleMenu()">确 定</el-button>
@@ -77,6 +77,7 @@ export default {
   data () {
     return {
       list: [],
+      tokenFail: this.$store.state.tokenFail,
       flag: 0,
       listLoading: true,
       // 控制分配权限对话框的显示与隐藏
@@ -85,10 +86,12 @@ export default {
       addDialogVisible: false,
       // 所有目录的数据
       menuList: [],
+      // 权限分配时的列表
       menuTreeProps: {
         label: 'name',
         children: 'children'
       },
+      // 所有选中的权限id
       menuDefkeys: [],
 
       roleId: 0,
@@ -120,6 +123,10 @@ export default {
         if (result.data.code === 0) {
           const res = result.data.data
           this.list = res
+        } else if (result.data.code === this.tokenFail) {
+          this.$message.error(result.data.msg)
+          this.$store.commit('delToken')
+          this.$router.push('/')
         } else {
           this.$message.error('查询失败')
         }
@@ -132,6 +139,10 @@ export default {
         .then(result => {
           if (result.data.code === 0) {
             this.menuList = result.data.data
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
             this.$message.error('获取权限数据失败！')
           }
@@ -143,6 +154,10 @@ export default {
           if (result.data.code === 0) {
             this.menuDefkeys = result.data.data
             this.setMenuDialogVisible = true
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
             this.$message.error('获取权限数据失败！')
           }
@@ -154,6 +169,10 @@ export default {
         ...this.$refs.menuDefkeys.getCheckedKeys()
         // ...this.$refs.menuDefkeys.getHalfCheckedKeys() // 半选中的节点(父类的Id)
       ]
+      const keyyyyy = [
+        ...this.$refs.menuDefkeys.getHalfCheckedKeys() // 半选中的节点(父类的Id)
+      ]
+      console.log(keyyyyy)
       this.$http.put('/menu/editRoleMenu/', {
         roleId: this.roleId,
         menuIds: keys
@@ -163,6 +182,10 @@ export default {
             this.$message.success('分配权限成功！')
             // 重新获取用户列表数据
             this.listAllBlog()
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
             this.$message.error('分配权限失败！')
           }
@@ -181,6 +204,10 @@ export default {
             this.$message.success(result.data.msg)
             this.listAllBlog()
             this.editDialogVisible = false
+          } else if (result.data.code === this.tokenFail) {
+            this.$message.error(result.data.msg)
+            this.$store.commit('delToken')
+            this.$router.push('/')
           } else {
             this.$message.error(result.data.msg)
           }
@@ -199,6 +226,10 @@ export default {
               this.$message.success(result.data.msg)
               // 重新获取用户列表数据
               this.listAllBlog()
+            } else if (result.data.code === this.tokenFail) {
+              this.$message.error(result.data.msg)
+              this.$store.commit('delToken')
+              this.$router.push('/')
             } else {
               this.$message.error(result.data.msg)
             }
@@ -222,6 +253,10 @@ export default {
                 this.$message.success(result.data.msg)
                 this.listAllBlog()
                 this.addDialogVisible = false
+              } else if (result.data.code === this.tokenFail) {
+                this.$message.error(result.data.msg)
+                this.$store.commit('delToken')
+                this.$router.push('/')
               } else {
                 this.$message.error(result.data.msg)
               }
