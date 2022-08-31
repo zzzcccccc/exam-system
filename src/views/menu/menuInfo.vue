@@ -81,6 +81,9 @@
           <el-option v-for="item in statusEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
           </el-select>
         </el-form-item>
+         <el-form-item label="排序">
+            <el-input v-model="editCateForm.sort"></el-input>
+        </el-form-item>
         <el-form-item label="描述">
             <el-input v-model="cateForm.detail"></el-input>
         </el-form-item>
@@ -98,7 +101,7 @@
         <el-button type="primary" @click="addMenu">确 定</el-button>
       </span>
     </el-dialog>
-    <!-- 编辑分类表单 -->
+    <!-- 编辑分类表单  style="width: 100%;outline: none;height: 100%" disabled输入框禁止操作-->
       <el-dialog title="编辑" :visible.sync="editDialogVisible" width="50%" >
       <el-form :model="editCateForm"
       ref="editCateForm" label-width="100px" :rules="cateFormRules">
@@ -106,10 +109,10 @@
             <el-input v-model="editCateForm.name"></el-input>
         </el-form-item>
          <el-form-item label="权限标识" prop="permission" >
-            <el-input v-model="editCateForm.permission" style="width: 100%;outline: none;height: 100%" disabled></el-input>
+            <el-input v-model="editCateForm.permission" ></el-input>
         </el-form-item>
         <el-form-item label="访问路径" prop="path" >
-            <el-input v-model="editCateForm.path" style="width: 100%;outline: none;height: 100%" disabled></el-input>
+            <el-input v-model="editCateForm.path"></el-input>
         </el-form-item>
         <el-form-item label="菜单icon">
             <el-input v-model="editCateForm.icon"></el-input>
@@ -118,6 +121,9 @@
           <el-select v-model="editCateForm.showFlag" placeholder="状态">
           <el-option v-for="item in statusEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="排序">
+            <el-input v-model="editCateForm.sort"></el-input>
         </el-form-item>
         <el-form-item label="描述">
             <el-input v-model="editCateForm.detail"></el-input>
@@ -142,13 +148,13 @@
 export default {
   data () {
     return {
+      userId: this.$cookie.get('loginId'),
       tokenFail: this.$store.state.tokenFail,
       columns: [
         { label: '菜单名称', prop: 'name', width: '150px' },
         { label: '权限标识', prop: 'permission' },
-        { label: '访问路径', prop: 'path', width: '150px' },
+        { label: '访问路径', prop: 'path' },
         { label: '菜单icon', prop: 'icon', width: '130px' },
-        { label: '描述', prop: 'detail' },
         { label: '菜单类型', prop: 'showFlag', type: 'template', template: 'isok', width: '60' },
         { label: '等级', prop: 'level', type: 'template', template: 'level', width: '60' },
         { label: '创建时间', prop: 'createTime' },
@@ -206,7 +212,6 @@ export default {
       this.options = []
       this.$http.get('/menu/getAll/' + this.flag)
         .then(result => {
-          console.log(result.data.code)
           if (result.data.code === 0) {
             this.categoriesdata = result.data.data
           } else if (result.data.code === this.tokenFail) {
@@ -218,6 +223,7 @@ export default {
           }
         })
     },
+    // 添加分类 -父级分类列表
     getSecondLevel () {
       this.options = []
       this.$http.get('/menu/getSecondLevel')

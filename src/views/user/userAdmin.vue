@@ -184,6 +184,7 @@ export default {
         .then(result => {
           if (result.data.code === 0) {
             this.chooseRoleNames = result.data.data
+            this.roles = result.data.data // 这句不加角色只可保存一个，加上一人可有多哥角色
             this.setRightDialogVisible = true
           } else {
             this.$message.error('获取角色数据失败！')

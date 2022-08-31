@@ -93,11 +93,11 @@ export default {
       isCollapse: false,
       activePath: '', // 被激活的菜单
       username: this.$cookie.get('userName'),
-      flag: 1 // 1目录 2按钮
+      roleIds: []
     }
   },
   created () {
-    this.getMenuList()
+    this.getUseRoleByUserId(this.loginId)
   },
   methods: {
     logout () {
@@ -113,13 +113,20 @@ export default {
           }
         })
     },
-    // 获取所有的菜单
-    async getMenuList () {
-      const { data: res } = await this.$http.get('/menu/getAll/' + this.flag)
+    // 根据用户ID获取权限id
+    async getUseRoleByUserId (loginId) {
+      const { data: res } = await this.$http.get('/system/getUseRoleByUserId/' + loginId)
       if (res.code !== 0) {
         return this.$message.success(res.msg)
       } else {
-        this.menuList = res.data
+        this.roleIds = res.data
+        // 获取所有的菜单
+        const { data: res1 } = await this.$http.get('/menu/getAllByRole/' + this.roleIds)
+        if (res1.code !== 0) {
+          return this.$message.success(res1.msg)
+        } else {
+          this.menuList = res1.data
+        }
       }
     },
     toggleCollapse () {

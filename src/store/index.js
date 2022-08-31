@@ -10,7 +10,8 @@ const store = new Vuex.Store({
   state: {
     // 存储token
     token: '',
-    tokenFail: 401 // 可选
+    tokenFail: 401, // 可选
+    permission: [] // 可选
   },
 
   getters: {
@@ -19,6 +20,9 @@ const store = new Vuex.Store({
     },
     getTokenFail (state) {
       return state.tokenFail
+    },
+    getPermission (state) {
+      return state.permission
     }
   },
 
@@ -28,6 +32,12 @@ const store = new Vuex.Store({
       state.token = token
       storage.set('token', token)
       console.log('store、localstorage保存token成功！')
+    },
+    // 修改token，并将permission存入localStorage
+    setPermission (state, permission) {
+      state.permission = permission
+      storage.set('permission', permission)
+      console.log('store、localstorage保存permission成功！')
     },
     delToken (state) {
       state.token = ''

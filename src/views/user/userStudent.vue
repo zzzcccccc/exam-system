@@ -18,7 +18,7 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="addUser()">添加用户</el-button>
+          <el-button v-if="permission.indexOf('student:add') > -1"  type="primary" @click="addUser()">添加用户</el-button>
         </el-col>
       </el-row>
       <br/>
@@ -41,13 +41,13 @@
             <template slot-scope="scope">
                 <!-- 放置修改、删除和分配角色按钮 -->
                 <el-tooltip effect="dark" content="分配角色" placement="top">
-                  <el-button type="warning" icon="el-icon-setting" size="mini"  @click="showRole(scope.row)" >分配角色</el-button>
+                  <el-button v-if="permission.indexOf('student:roles') > -1" type="warning" icon="el-icon-setting" size="mini"  @click="showRole(scope.row)" >分配角色</el-button>
                 </el-tooltip>
-                    <el-tooltip effect="dark" content="修改" placement="top">
-                    <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row)">修改</el-button>
+                <el-tooltip effect="dark" content="修改" placement="top">
+                    <el-button v-if="permission.indexOf('student:roles') > -1" type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row)">修改</el-button>
                 </el-tooltip>
                  <el-tooltip effect="dark" content="删除" placement="top">
-                  <el-button type="danger" icon="el-icon-delete" size="mini" @click="delUser(scope.row)">删除</el-button>
+                  <el-button v-if="permission.indexOf('student:del') > -1" type="danger" icon="el-icon-delete" size="mini" @click="delUser(scope.row)">删除</el-button>
                 </el-tooltip>
             </template>
         </el-table-column>
@@ -79,6 +79,7 @@ export default {
   data () {
     return {
       tokenFail: this.$store.state.tokenFail,
+      permission: this.$store.getters.getPermission,
       queryInfo: {
         current: 1,
         size: 10,
@@ -172,7 +173,7 @@ export default {
     },
     showRole (row) {
       this.userId = row.id
-      this.$http.get('/system/getAllRole')
+      this.$http.get('/system/getAllRole/')
         .then(result => {
           if (result.data.code === 0) {
             this.tableData = result.data.data
@@ -184,6 +185,7 @@ export default {
         .then(result => {
           if (result.data.code === 0) {
             this.chooseRoleNames = result.data.data
+            this.roles = result.data.data // 这句不加角色只可保存一个，加上一人可有多哥角色
             this.setRightDialogVisible = true
           } else {
             this.$message.error('获取角色数据失败！')
@@ -202,8 +204,10 @@ export default {
       if (index > -1) { // 大于0 代表存在，
         listRoles.splice(index, 1)// 存在就删除
         this.roles = listRoles
+        console.log('del-', this.roles)
       }
     },
+    // 用户分配角色
     editRoles () {
       this.editRolesDto.userId = this.userId
       this.editRolesDto.roleIds = this.roles

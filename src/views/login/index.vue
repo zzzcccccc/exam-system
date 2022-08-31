@@ -61,9 +61,17 @@ export default {
             this.$cookie.set('userName', this.loginForm.userName)
             this.$cookie.set('loginId', res.data.data.loginId)
             this.$router.push({ path: '/dashboard' })
-            console.log('登录入口')
             this.$store.commit('setToken', res.data.data.tokenValue)
             // localStorage.setItem('token', JSON.stringify(res.data.data.tokenValue))
+            // 获取用户的权限标识
+            this.$http.get('/menu/getPermissionList/' + res.data.data.loginId)
+              .then(result => {
+                if (result.data.code === 0) {
+                  this.$store.commit('setPermission', result.data.data)
+                } else {
+                  this.$message.error(result.data.msg)
+                }
+              })
           } else {
             this.$message.error(res.data.msg)
           }

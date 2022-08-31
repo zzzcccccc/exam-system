@@ -166,13 +166,14 @@ export default {
     editRoleMenu () {
       // "..."为“展开运算符”，将一个数组转为用逗号分隔的参数序列
       const keys = [
-        ...this.$refs.menuDefkeys.getCheckedKeys()
-        // ...this.$refs.menuDefkeys.getHalfCheckedKeys() // 半选中的节点(父类的Id)
-      ]
-      const keyyyyy = [
+        ...this.$refs.menuDefkeys.getCheckedKeys(),
         ...this.$refs.menuDefkeys.getHalfCheckedKeys() // 半选中的节点(父类的Id)
       ]
-      console.log(keyyyyy)
+      // const keyssss = [
+      //   ...this.$refs.menuDefkeys.getHalfCheckedKeys() // 半选中的节点(父类的Id)
+      // ]
+      console.log(keys)
+      // console.log('keyssss-', keyssss)
       this.$http.put('/menu/editRoleMenu/', {
         roleId: this.roleId,
         menuIds: keys
