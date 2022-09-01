@@ -1,3 +1,5 @@
+<!--左侧菜单返回两级时，第二级可以打开页面；如果是第三级里有菜单的子选项，那返回三级的话二级目录即使选择的
+菜单也不可点击跳路径 -->
 <template>
 <div>
    <!-- 面包屑导航 -->
@@ -74,7 +76,7 @@
             <el-input v-model="cateForm.path"></el-input>
         </el-form-item>
         <el-form-item label="菜单icon">
-            <el-input v-model="cateForm.icon"></el-input>
+            <el-input v-model="icon"></el-input>
         </el-form-item>
         <el-form-item label="菜单类型" prop="showFlag"  required>
           <el-select v-model="cateForm.showFlag" placeholder="状态">
@@ -82,7 +84,7 @@
           </el-select>
         </el-form-item>
          <el-form-item label="排序">
-            <el-input v-model="editCateForm.sort"></el-input>
+            <el-input v-model="sort"></el-input>
         </el-form-item>
         <el-form-item label="描述">
             <el-input v-model="cateForm.detail"></el-input>
@@ -148,6 +150,8 @@
 export default {
   data () {
     return {
+      icon: 'el-icon-menu', // icon,sort是新增目录时默认值
+      sort: 999,
       userId: this.$cookie.get('loginId'),
       tokenFail: this.$store.state.tokenFail,
       columns: [
@@ -205,7 +209,7 @@ export default {
   },
   created () {
     this.getMenuAll()
-    this.getSecondLevel()
+    // this.getSecondLevel()
   },
   methods: {
     getMenuAll () {
@@ -250,6 +254,8 @@ export default {
     addMenu () {
       this.$refs.cateForm.validate((valid) => {
         if (valid) {
+          this.cateForm.icon = this.icon
+          this.cateForm.sort = this.sort
           this.$http.post('/menu/addMenu', this.cateForm)
             .then(result => {
               if (result.data.code === 0) {
@@ -270,6 +276,7 @@ export default {
       })
     },
     openadd (row) {
+      this.getSecondLevel()
       this.cateForm = {}
       this.value = []
       if (row.parentId !== -1) {
@@ -280,13 +287,14 @@ export default {
       this.addDialogVisible = true
     },
     openedit (row) {
+      this.getSecondLevel()
       if (row.level === 3) {
         this.$http.get('/menu/getInfoById/' + row.parentId)
           .then(result => {
             if (result.data.code === 0) {
               this.value = []
-              this.value.push(result.data.data.parentId)
-              this.value.push(row.parentId)
+              this.value.push(result.data.data.parentId) // 一级的menuId
+              this.value.push(row.parentId) // 二级的menuId
               this.editCateForm = row
               this.editCateForm.value = this.value // 回显子类的名称
               this.editDialogVisible = true
@@ -302,7 +310,6 @@ export default {
     },
     editMenu () {
       this.$refs.editCateForm.validate((valid) => {
-        console.log(this.editCateForm)
         if (valid) {
           this.$http.put('/menu/editMenu', this.editCateForm)
             .then(result => {

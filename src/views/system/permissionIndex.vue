@@ -1,4 +1,4 @@
-<!-- data数据 必须是树形结构 -->
+<!-- data数据 必须是树形结构   demo页面  测试-->
 <!-- columns 设置属性 -->
 <!-- border边框 -->
 <!-- show-row-hover="false" 高亮显示为false -->
@@ -70,8 +70,8 @@
             <el-select v-model="permissionCateForm.parentId" clearable  filterable placeholder="请选择">
             <el-option
               v-for="item in options"
-              :key="item.id"
-              :label="item.permissionName"
+              :key="item.menu_id"
+              :label="item.name"
               :value="item.id">
             </el-option>
           </el-select>
@@ -119,7 +119,7 @@ export default {
     return {
       tokenFail: this.$store.state.tokenFail,
       columns: [
-        { label: '权限名称', prop: 'permissionName' },
+        { label: '权限名称', prop: 'name' },
         {
           label: '权限标识',
           prop: 'permission'
@@ -174,7 +174,7 @@ export default {
   },
   methods: {
     getPermissionAll () {
-      this.$http.get('/system/getAllPermission')
+      this.$http.get('/menu/getAll/0')
         .then(result => {
           if (result.data.code === 0) {
             this.categoriesdata = result.data.data

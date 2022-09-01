@@ -9,7 +9,7 @@
             :data="rightsList"
             :props="data"
             show-checkbox
-            node-key="id"
+            node-key="menu_id"
             default-expand-all
             :expand-on-click-node="false"
             :render-content="renderContent">
@@ -43,8 +43,8 @@ export default {
       rightsList: [],
       setAddPermissionDialogVisible: false,
       data: {
-        id: 'id',
-        label: 'permissionName',
+        id: 'menu_id',
+        label: 'name',
         children: 'children'
       },
       permissionForm: {
@@ -67,7 +67,7 @@ export default {
   },
   methods: {
     getPermissionAll () {
-      this.$http.get('/system/getAllPermission')
+      this.$http.get('/menu/getAll/0')
         .then(result => {
           if (result.data.code === 0) {
             this.rightsList = result.data.data

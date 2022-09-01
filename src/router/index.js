@@ -13,6 +13,7 @@ import RoleIndex from '../views/system/roleIndex.vue'
 import PermissionIndex from '../views/system/permissionIndex.vue'
 import PermissionDemo from '../views/system/perListAddTest.vue'
 import MenuInfo from '../views/menu/menuInfo.vue'
+import SubjectInfo from '../views/subject/subjectInfo.vue'
 import store from '../store'
 import storage from '../model/storage'
 
@@ -100,6 +101,17 @@ const routes = [
       {
         path: '/menu/menuInfo',
         component: MenuInfo
+      }
+    ]
+  },
+  // 学科管理
+  {
+    path: '/subject',
+    component: Layout,
+    children: [
+      {
+        path: '/subject/list',
+        component: SubjectInfo
       }
     ]
   }

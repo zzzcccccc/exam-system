@@ -44,7 +44,7 @@
                   <el-button v-if="permission.indexOf('student:roles') > -1" type="warning" icon="el-icon-setting" size="mini"  @click="showRole(scope.row)" >分配角色</el-button>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="修改" placement="top">
-                    <el-button v-if="permission.indexOf('student:roles') > -1" type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row)">修改</el-button>
+                    <el-button v-if="permission.indexOf('student:edit') > -1" type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row)">修改</el-button>
                 </el-tooltip>
                  <el-tooltip effect="dark" content="删除" placement="top">
                   <el-button v-if="permission.indexOf('student:del') > -1" type="danger" icon="el-icon-delete" size="mini" @click="delUser(scope.row)">删除</el-button>
@@ -160,11 +160,15 @@ export default {
         this.$http.delete('/user/del/' + row.id)
           .then(result => {
             if (result.data.code === 0) {
-              this.$message.success('删除成功')
+              this.$message.success(result.data.msg)
               // 重新获取用户列表数据
               this.listAllBlog()
+            } else if (result.data.code === this.tokenFail) {
+              this.$message.error(result.data.msg)
+              this.$store.commit('delToken')
+              this.$router.push('/')
             } else {
-              this.$message.error('删除失败')
+              this.$message.error(result.data.msg)
             }
           })
       }).catch(() => {

@@ -159,11 +159,15 @@ export default {
         this.$http.delete('/user/del/' + row.id)
           .then(result => {
             if (result.data.code === 0) {
-              this.$message.success('删除成功')
+              this.$message.success(result.data.msg)
               // 重新获取用户列表数据
               this.listAllBlog()
+            } else if (result.data.code === this.tokenFail) {
+              this.$message.error(result.data.msg)
+              this.$store.commit('delToken')
+              this.$router.push('/')
             } else {
-              this.$message.error('删除失败')
+              this.$message.error(result.data.msg)
             }
           })
       }).catch(() => {
