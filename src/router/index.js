@@ -4,16 +4,15 @@ import Layout from '../layout/layout.vue'
 import Index from '../views/login/index.vue'
 import Profile from '../profile/info.vue'
 import Welcome from '../components/welcome.vue'
-import UserTeacher from '../views/user/userTeacher.vue'
 import AddUser from '../views/user/addUser.vue'
 import EditUser from '../views/user/editUser.vue'
-import UserStudent from '../views/user/userStudent.vue'
-import UserAdmin from '../views/user/userAdmin.vue'
+import UserInfo from '../views/user/userInfo.vue'
 import RoleIndex from '../views/system/roleIndex.vue'
 import PermissionIndex from '../views/system/permissionIndex.vue'
 import PermissionDemo from '../views/system/perListAddTest.vue'
 import MenuInfo from '../views/menu/menuInfo.vue'
 import SubjectInfo from '../views/subject/subjectInfo.vue'
+import ClassInfo from '../views/class/classInfo.vue'
 import store from '../store'
 import storage from '../model/storage'
 
@@ -53,10 +52,6 @@ const routes = [
     component: Layout,
     children: [
       {
-        path: '/user/teacherInfo',
-        component: UserTeacher
-      },
-      {
         path: '/user/addUser',
         component: AddUser
       },
@@ -65,12 +60,8 @@ const routes = [
         component: EditUser
       },
       {
-        path: '/user/studentInfo',
-        component: UserStudent
-      },
-      {
-        path: '/user/adminInfo',
-        component: UserAdmin
+        path: '/user/userInfo',
+        component: UserInfo
       }
     ]
   },
@@ -112,6 +103,17 @@ const routes = [
       {
         path: '/subject/list',
         component: SubjectInfo
+      }
+    ]
+  },
+  // 班级管理
+  {
+    path: '/class',
+    component: Layout,
+    children: [
+      {
+        path: '/class/list',
+        component: ClassInfo
       }
     ]
   }

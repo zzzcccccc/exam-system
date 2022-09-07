@@ -11,7 +11,8 @@ const store = new Vuex.Store({
     // 存储token
     token: '',
     tokenFail: 401, // 可选
-    permission: [] // 可选
+    permission: [], // 可选
+    role: [] // 可选
   },
 
   getters: {
@@ -23,6 +24,9 @@ const store = new Vuex.Store({
     },
     getPermission (state) {
       return state.permission
+    },
+    getRole (state) {
+      return state.role
     }
   },
 
@@ -39,9 +43,20 @@ const store = new Vuex.Store({
       storage.set('permission', permission)
       console.log('store、localstorage保存permission成功！')
     },
+    setRole (state, role) {
+      state.role = role
+      storage.set('role', role)
+      console.log('store、localstorage保存role成功！')
+    },
     delToken (state) {
       state.token = ''
       storage.remove('token')
+    },
+    delAll (state) {
+      state.token = ''
+      state.permission= []
+      state.role= []
+      storage.removeAll()
     },
     // 可选
     setUserInfo (state, userName) {

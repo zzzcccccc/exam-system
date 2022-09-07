@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>学科管理</el-breadcrumb-item>
-      <el-breadcrumb-item>学科创编</el-breadcrumb-item>
+      <el-breadcrumb-item>班级创编</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图 -->
      <el-card>
@@ -13,11 +13,11 @@
         <!-- 分栏一共占24格，给搜索框7格，添加按钮4格 -->
         <el-col :span="4">
           <!-- 搜索与添加区域 clearable清空输入框-->
-          <el-input placeholder="请输入学科名称"  v-model="queryInfo.name" clearable @clear="getPageSubject()">
+          <el-input placeholder="请输入班级名称"  v-model="queryInfo.name" clearable @clear="getPage()">
           </el-input>
         </el-col>
         <el-col :span="4">
-            <el-select v-model="queryInfo.gradeId" filterable placeholder="请选择年级"  clearable @clear="getPageSubject()">
+            <el-select v-model="queryInfo.gradeId" filterable placeholder="请选择年级"  clearable @clear="getPage()">
                 <el-option
                 v-for="item in options"
                 :key="item.id"
@@ -27,7 +27,7 @@
             </el-select>
         </el-col>
         <el-col :span="3">
-          <el-button type="primary" icon="el-icon-search" @click="getPageSubject()">搜索</el-button>
+          <el-button type="primary" icon="el-icon-search" @click="getPage()">搜索</el-button>
         </el-col>
         <el-col :span="3">
           <el-button type="success" icon="el-icon-plus"   @click="addShow()">新增</el-button>
@@ -62,7 +62,7 @@
     </el-card>
     <el-dialog title="新增" :visible.sync="addDialogVisible" width="50%" >
       <el-form :model="subjectInfo" ref="subjectInfo"  :rules="rules"  label-width="100px" >
-        <el-form-item label="学科名称:" prop="name">
+        <el-form-item label="班级名称:" prop="name">
           <el-input v-model="subjectInfo.name" ></el-input>
         </el-form-item>
         <el-form-item label="年级:" prop="gradeId">
@@ -83,7 +83,7 @@
     </el-dialog>
     <el-dialog title="批量新增" :visible.sync="addBatchDialogVisible" width="50%" >
       <el-form :model="subjectInfo" ref="subjectInfo"  :rules="addBatchRules"  label-width="100px" >
-        <el-form-item label="学科名称:" prop="name">
+        <el-form-item label="班级名称:" prop="name">
           <el-input v-model="subjectInfo.name" ></el-input>
         </el-form-item>
         <el-form-item label="年级:" prop="gradeId">
@@ -101,7 +101,7 @@
     </el-dialog>
     <el-dialog title="编辑" :visible.sync="editDialogVisible" width="50%" >
       <el-form :model="subjectInfo" ref="subjectInfo"  :rules="rules"  label-width="100px" >
-        <el-form-item label="学科名称:" prop="name">
+        <el-form-item label="班级名称:" prop="name">
           <el-input v-model="subjectInfo.name" ></el-input>
         </el-form-item>
         <el-form-item label="年级:" prop="gradeId">
@@ -162,12 +162,12 @@ export default {
     }
   },
   created () {
-    this.getPageSubject()
+    this.getPage()
     this.getAllGrade() // 年级列表
   },
   methods: {
-    getPageSubject () {
-      this.$http.get('/subject/getPageSubject', {
+    getPage () {
+      this.$http.get('/class/getPage', {
         params: this.queryInfo
       }).then(result => {
         if (result.data.code === 0) {
@@ -208,6 +208,7 @@ export default {
     },
     addBatchShow () {
       this.subjectInfo = {}
+      this.chooseGradeIds = []
       this.addBatchDialogVisible = true
     },
     editShow (row) {
@@ -217,14 +218,14 @@ export default {
     add (subjectInfo) {
       this.$refs.subjectInfo.validate((valid) => { // 开启校验
         if (valid) { // 如果校验通过，请求接口，允许提交表单
-          this.$http.post('subject/add', {
+          this.$http.post('class/add', {
             name: subjectInfo.name,
             gradeId: subjectInfo.gradeId
           })
             .then(result => {
               if (result.data.code === 0) {
                 this.$message.success(result.data.msg)
-                this.getPageSubject()
+                this.getPage()
                 this.addDialogVisible = false
               } else if (result.data.code === this.tokenFail) {
                 this.$message.error(result.data.msg)
@@ -243,14 +244,14 @@ export default {
     addBatch (subjectInfo) {
       this.$refs.subjectInfo.validate((valid) => { // 开启校验
         if (valid) { // 如果校验通过，请求接口，允许提交表单
-          this.$http.post('subject/addBatch', {
+          this.$http.post('class/addBatch', {
             name: subjectInfo.name,
             chooseGradeIds: this.chooseGradeIds
           })
             .then(result => {
               if (result.data.code === 0) {
                 this.$message.success(result.data.msg)
-                this.getPageSubject()
+                this.getPage()
                 this.addBatchDialogVisible = false
               } else if (result.data.code === this.tokenFail) {
                 this.$message.error(result.data.msg)
@@ -283,11 +284,11 @@ export default {
     edit (subjectInfo) {
       this.$refs.subjectInfo.validate((valid) => { // 开启校验
         if (valid) { // 如果校验通过，请求接口，允许提交表单
-          this.$http.put('subject/edit', subjectInfo)
+          this.$http.put('class/edit', subjectInfo)
             .then(result => {
               if (result.data.code === 0) {
                 this.$message.success(result.data.msg)
-                this.getPageSubject()
+                this.getPage()
                 this.editDialogVisible = false
               } else if (result.data.code === this.tokenFail) {
                 this.$message.error(result.data.msg)
@@ -310,12 +311,12 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http.delete('/subject/del/' + row.id)
+        this.$http.delete('/class/del/' + row.id)
           .then(result => {
             if (result.data.code === 0) {
               this.$message.success(result.data.msg)
               // 重新获取用户列表数据
-              this.getPageSubject()
+              this.getPage()
             } else if (result.data.code === this.tokenFail) {
               this.$message.error(result.data.msg)
               this.$store.commit('delToken')

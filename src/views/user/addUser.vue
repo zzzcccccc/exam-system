@@ -31,6 +31,39 @@
       <el-form-item label="手机：">
         <el-input v-model="form.phone"></el-input>
       </el-form-item>
+      <el-form-item label="年级：">
+        <el-select v-model="gradeId" filterable placeholder="请选择年级">
+          <el-option
+          v-for="item in options"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="role.indexOf('teacher') > -1" label="学科：">
+        <el-select v-model="form.subjectId" filterable placeholder="请选择学科">
+          <el-option
+          v-for="item in subjectOptions"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item  label="班级：">
+        <!-- :label是传回的值  -->
+        <el-checkbox-group v-model="chooseClassNames">
+          <el-checkbox v-for="item in classOptions"  @change="val => handleChecked(val,item.id)" :label="item.id"
+          :key="item.id" name="type">{{ item.name }}</el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
+      <el-form-item label="角色：" prop="chooseRoleNames"  required>
+        <el-checkbox-group v-model="chooseRoleNames">
+          <el-checkbox v-for="item in roleOptions"  @change="val => handleCheckedRole(val,item.id)" :label="item.id"
+          :key="item.id" name="type">{{ item.roleName }}</el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
       <el-form-item label="状态：" prop="status">
         <el-select v-model="form.status" placeholder="状态">
           <el-option v-for="item in statusEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
@@ -49,6 +82,7 @@ export default {
   data () {
     return {
       tokenFail: this.$store.state.tokenFail,
+      role: this.$store.getters.getRole,
       form: {
         id: null,
         userName: '',
@@ -59,8 +93,22 @@ export default {
         sex: null,
         birthDay: '',
         phone: '',
-        roleId: this.$route.query.index
+        subjectId: null,
+        gradeId: null,
+        classIds: [],
+        roleIds: []
       },
+      options: [], // 年级下拉框
+      gradeId: null, // 年级id
+      subjectOptions: [], // 学科下拉框
+      classOptions: [], // 班级多选框数据
+      roleOptions: [], // 角色多选框数据
+      // 多选框回显的已经选中点的数据
+      chooseClassNames: [],
+      chooseRoleNames: [],
+      // 当前操作后选中的
+      classIds: [],
+      roleIds: [],
       rules: {
         userName: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
@@ -77,6 +125,9 @@ export default {
         ],
         status: [
           { required: true, message: '请选择状态', trigger: 'blur' }
+        ],
+        chooseRoleNames: [
+          { required: true, message: '请选择角色', trigger: 'blur' }
         ]
       },
       sexEnum: [
@@ -99,10 +150,49 @@ export default {
       ]
     }
   },
+  watch: {
+    gradeId () {
+      // 获取学科
+      this.$http.get('/subject/getSubjectByGradeId/' + this.gradeId).then(result => {
+        if (result.data.code === 0) {
+          const res = result.data.data
+          if (res == undefined || res.length <= 0) {
+            this.subjectOptions = []
+            this.form.subjectId = null
+          } else {
+            this.subjectOptions = res
+          }
+        } else {
+          this.$message.error('查询失败')
+        }
+      })
+      // 获取班级
+      this.$http.get('/class/getClassByGradeId/' + this.gradeId).then(result => {
+        if (result.data.code === 0) {
+          const res = result.data.data
+          if (res == undefined || res.length <= 0) {
+            this.classOptions = []
+            this.form.classIds = []
+          } else {
+            this.classOptions = res
+          }
+        } else {
+          this.$message.error('查询失败')
+        }
+      })
+    }
+  },
+  created () {
+    this.getAllGrade() // 年级列表
+    this.getRoleList() // 所有角色列表
+  },
   methods: {
     submitForm () {
       this.$refs.form.validate((valid) => { // 开启校验
         if (valid) {
+          this.form.gradeId = this.gradeId
+          this.form.classIds = this.classIds
+          this.form.roleIds = this.roleIds
           this.$http.post('user/addUser', this.form)
             .then(result => {
               if (result.data.code === 0) {
@@ -121,18 +211,69 @@ export default {
         }
       })
     },
+    getRoleList () {
+      this.$http.get('/system/getAllRole')
+        .then(result => {
+          if (result.data.code === 0) {
+            this.roleOptions = result.data.data
+          } else {
+            this.$message.error('获取角色数据失败！')
+          }
+        })
+    },
+    getAllGrade () {
+      this.$http.get('/subject/getAllGrade').then(result => {
+        if (result.data.code === 0) {
+          this.options = result.data.data
+        } else {
+          this.$message.error('查询失败')
+        }
+      })
+    },
+    handleChecked (val, item) {
+      if (val) {
+        this.classIds.push(item)
+      } else {
+        this.deleteItem(item, this.classIds)
+      }
+    },
+    deleteItem (item, listClassIds) {
+      var index = listClassIds.indexOf(item)
+      if (index > -1) { // 大于0 代表存在，
+        listClassIds.splice(index, 1)// 存在就删除
+        this.classIds = listClassIds
+      }
+    },
+    // 角色
+    handleCheckedRole (val, item) {
+      if (val) {
+        this.roleIds.push(item)
+      } else {
+        this.deleteItemRole(item, this.roles)
+      }
+    },
+    deleteItemRole (item, listRoles) {
+      var index = listRoles.indexOf(item)
+      if (index > -1) { // 大于0 代表存在，
+        listRoles.splice(index, 1)// 存在就删除
+        this.roleIds = listRoles
+      }
+    },
     restForm () {
       this.form = {
         id: null,
         userName: '',
         password: '',
         realName: '',
-        roleId: this.$route.query.index,
         status: 1,
-        age: '',
-        sex: '',
-        birthDay: null,
-        phone: null
+        age: null,
+        sex: null,
+        birthDay: '',
+        phone: '',
+        subjectId: null,
+        gradeId: null,
+        classIds: [],
+        roleIds: []
       }
     },
     getBack () {

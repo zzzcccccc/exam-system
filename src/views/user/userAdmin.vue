@@ -1,3 +1,4 @@
+<!-- DEMO 1.0 第一版-->
 <template>
 <div>
     <!-- 面包屑导航 -->
@@ -24,12 +25,12 @@
       <br/>
       <!-- 带边框、斑马纹  v-loading="listLoading" 预加载-->
       <el-table  v-loading="listLoading"  :data="list" border stripe>
-        <el-table-column type="index" label="序号"  width="55"  align="center"/>
+        <el-table-column type="index" label="序号"  align="center"/>
         <el-table-column prop="userName" label="用户名"/>
         <el-table-column prop="realName" label="真实姓名" />
-        <el-table-column prop="sex" label="性别" width="80px;"  :formatter="sexFormatter" />
+        <el-table-column prop="sex" label="性别" width="50px;"  :formatter="sexFormatter" />
         <el-table-column prop="phone" label="手机号"/>
-        <el-table-column prop="createTime" label="创建时间" width="160px"/>
+        <el-table-column prop="createTime" label="创建时间"/>
         <el-table-column label="状态" prop="status" width="70px">
           <template  slot-scope="scope">
            <el-tag :type="(scope.row.status == '1' ? 'success' :  'danger')">
@@ -37,17 +38,17 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="290px">
+        <el-table-column label="操作" width="180px">
             <template slot-scope="scope">
                 <!-- 放置修改、删除和分配角色按钮 -->
                 <el-tooltip effect="dark" content="分配角色" placement="top">
-                  <el-button type="warning" icon="el-icon-setting" size="mini"  @click="showRole(scope.row)" >分配角色</el-button>
+                  <el-button type="warning" icon="el-icon-setting" size="mini"  @click="showRole(scope.row)" ></el-button>
                 </el-tooltip>
                     <el-tooltip effect="dark" content="修改" placement="top">
-                    <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row)">修改</el-button>
+                    <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row)"></el-button>
                 </el-tooltip>
                  <el-tooltip effect="dark" content="删除" placement="top">
-                  <el-button type="danger" icon="el-icon-delete" size="mini" @click="delUser(scope.row)">删除</el-button>
+                  <el-button type="danger" icon="el-icon-delete" size="mini" @click="delUser(scope.row)"></el-button>
                 </el-tooltip>
             </template>
         </el-table-column>

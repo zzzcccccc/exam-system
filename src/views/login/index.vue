@@ -57,19 +57,25 @@ export default {
       this.$http.get('/user/doLogin?userName=' + this.loginForm.userName + '&password=' + this.loginForm.password)
         .then(res => {
           if (res.data.code === 0) {
+            var loginId = res.data.data.loginId
             this.$message.success(res.data.msg)
             this.$cookie.set('userName', this.loginForm.userName)
-            this.$cookie.set('loginId', res.data.data.loginId)
+            this.$cookie.set('loginId', loginId)
             this.$router.push({ path: '/dashboard' })
             this.$store.commit('setToken', res.data.data.tokenValue)
             // localStorage.setItem('token', JSON.stringify(res.data.data.tokenValue))
             // 获取用户的权限标识
-            this.$http.get('/menu/getPermissionList/' + res.data.data.loginId)
+            this.$http.get('/menu/getPermissionList/' + loginId)
               .then(result => {
                 if (result.data.code === 0) {
                   this.$store.commit('setPermission', result.data.data)
-                } else {
-                  this.$message.error(result.data.msg)
+                }
+              })
+              // 获取用户的角色
+            this.$http.get('/menu/getRoleList/' + loginId)
+              .then(result => {
+                if (result.data.code === 0) {
+                  this.$store.commit('setRole', result.data.data)
                 }
               })
           } else {

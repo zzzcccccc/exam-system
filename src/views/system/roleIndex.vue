@@ -14,7 +14,7 @@
     </el-row>
     <br/>
     <!-- 带边框、斑马纹  v-loading="listLoading" 预加载-->
-      <el-table  v-loading="listLoading"  :data="list" border stripe>
+      <el-table :data="list" border stripe>
         <el-table-column type="index" label="序号"  width="70"  align="center"/>
         <el-table-column prop="role" label="角色标识"/>
         <el-table-column prop="roleName" label="角色名称"/>
@@ -79,7 +79,6 @@ export default {
       list: [],
       tokenFail: this.$store.state.tokenFail,
       flag: 0,
-      listLoading: true,
       // 控制分配权限对话框的显示与隐藏
       setMenuDialogVisible: false,
       editDialogVisible: false,
@@ -117,7 +116,6 @@ export default {
   },
   methods: {
     listAllBlog () {
-      this.listLoading = true
       this.$http.get('/system/getAllRole').then(result => {
         // this.list = result.data;
         if (result.data.code === 0) {
@@ -130,7 +128,6 @@ export default {
         } else {
           this.$message.error('查询失败')
         }
-        this.listLoading = false
       })
     },
     showMenu (row) {
