@@ -3,7 +3,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '' }">用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/user/teacherInfo' }">用户列表</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/user/userInfo' }">用户列表</el-breadcrumb-item>
       <el-breadcrumb-item>用户编辑</el-breadcrumb-item>
     </el-breadcrumb>
     <el-form :model="form" ref="form" label-width="100px" :rules="rules">
@@ -29,6 +29,39 @@
       </el-form-item>
       <el-form-item label="手机：">
         <el-input v-model="form.phone"></el-input>
+      </el-form-item>
+      <el-form-item label="年级：">
+        <el-select v-model="gradeId" filterable placeholder="请选择年级">
+          <el-option
+          v-for="item in options"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="学科：">
+        <el-select v-model="form.subjectId" filterable placeholder="请选择学科">
+          <el-option
+          v-for="item in subjectOptions"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item  label="班级：">
+        <!-- :label是传回的值  -->
+        <el-checkbox-group v-model="chooseClassIds">
+          <el-checkbox v-for="item in classOptions"  @change="val => handleChecked(val,item.id)" :label="item.id"
+          :key="item.id" name="type">{{ item.name }}</el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
+      <el-form-item label="角色：" prop="chooseRoleIds">
+        <el-checkbox-group v-model="chooseRoleIds">
+          <el-checkbox v-for="item in roleOptions"  @change="val => handleCheckedRole(val,item.id)" :label="item.id"
+          :key="item.id" name="type">{{ item.roleName }}</el-checkbox>
+        </el-checkbox-group>
       </el-form-item>
       <el-form-item label="状态：" prop="staus">
         <el-select v-model="form.status" placeholder="状态">
@@ -58,8 +91,21 @@ export default ({
         sex: null,
         birthDay: '',
         phone: '',
-        role: this.$route.query.index
+        subjectId: null,
+        gradeId: null,
+        classIds: [],
+        roleIds: []
       },
+      options: [], // 年级下拉框
+      gradeId: null,
+      subjectOptions: [],
+      change_number: 0,
+      classOptions: [],
+      change_number_class: 0,
+      roleOptions: [],
+      classIds: [],
+      roleIds: [],
+      chooseClassIds: [],
       rules: {
         userName: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
@@ -98,11 +144,52 @@ export default ({
       ]
     }
   },
+  watch: {
+    gradeId () {
+      // 获取学科
+      this.$http.get('/subject/getSubjectByGradeId/' + this.gradeId).then(result => {
+        if (result.data.code === 0) {
+          this.change_number++
+          if (this.change_number > 1) {
+            this.form.subjectId = null
+          }
+          const res = result.data.data
+          if (res == undefined || res.length <= 0) {
+            this.subjectOptions = []
+          } else {
+            this.subjectOptions = res
+          }
+        }
+      })
+      // 获取班级
+      this.$http.get('/class/getClassByGradeId/' + this.gradeId).then(result => {
+        if (result.data.code === 0) {
+          this.change_number_class++
+          if (this.change_number_class > 1) {
+            this.classIds = []
+          }
+          const res = result.data.data
+          if (res == undefined || res.length <= 0) {
+            this.classOptions = []
+          } else {
+            this.classOptions = res
+          }
+        }
+      })
+    }
+  },
   created () {
+    this.getAllGrade() // 年级列表
+    this.getRoleList()
+    this.getUseRoleByUserId()
     this.$http.get('user/getInfoById/' + this.$route.query.id)
       .then(result => {
         if (result.data.code === 0) {
-          this.form = result.data.data
+          const res = result.data.data
+          this.gradeId = res.gradeId
+          this.chooseClassIds = res.classIdArray
+          this.classIds = res.classIdArray
+          this.form = res
         }
       })
   },
@@ -110,6 +197,9 @@ export default ({
     submitForm () {
       this.$refs.form.validate((valid) => {
         if (valid) {
+          this.form.gradeId = this.gradeId
+          this.form.classIds = this.classIds
+          this.form.roleIds = this.roleIds
           this.$http.put('user/editUser', this.form)
             .then(result => {
               if (result.data.code === 0) {
@@ -127,6 +217,63 @@ export default ({
           return false
         }
       })
+    },
+    getAllGrade () {
+      this.$http.get('/subject/getAllGrade').then(result => {
+        if (result.data.code === 0) {
+          this.options = result.data.data
+        } else {
+          this.$message.error(result.data.msg)
+          this.$store.commit('delToken')
+          this.$router.push('/')
+        }
+      })
+    },
+    getRoleList () {
+      this.$http.get('/system/getAllRole')
+        .then(result => {
+          if (result.data.code === 0) {
+            this.roleOptions = result.data.data
+          }
+        })
+    },
+    getUseRoleByUserId () {
+      this.$http.get('/system/getUseRoleByUserId/' + this.$route.query.id)
+        .then(result => {
+          if (result.data.code === 0) {
+            this.chooseRoleIds = result.data.data
+            this.roleIds = result.data.data // 这句不加角色只可保存一个，加上一人可有多哥角色
+          }
+        })
+    },
+    handleChecked (val, item) {
+      if (val) {
+        this.classIds.push(item)
+      } else {
+        this.deleteItem(item, this.classIds)
+      }
+    },
+    deleteItem (item, listClassIds) {
+      var index = listClassIds.indexOf(item)
+      if (index > -1) { // 大于0 代表存在，
+        listClassIds.splice(index, 1)// 存在就删除
+        this.classIds = listClassIds
+      }
+    },
+    // 角色
+    handleCheckedRole (val, item) {
+      if (val) {
+        this.roleIds.push(item)
+      } else {
+        this.deleteItemRole(item, this.roleIds)
+      }
+    },
+    deleteItemRole (item, listRoles) {
+      var index = listRoles.indexOf(item)
+      if (index > -1) { // 大于0 代表存在，
+        listRoles.splice(index, 1)// 存在就删除
+        this.roleIds = listRoles
+      }
     },
     restForm () {
       this.form = {

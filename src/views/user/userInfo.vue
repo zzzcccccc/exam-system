@@ -75,7 +75,7 @@
             <template slot-scope="scope">
                 <!-- 放置修改、删除按钮 -->
                 <el-tooltip effect="dark" content="查看" placement="top">
-                    <el-button  type="info" icon="el-icon-view" size="mini" @click="editUser(scope.row)"></el-button>
+                    <el-button  type="info" icon="el-icon-view" size="mini" @click="showInfo(scope.row)"></el-button>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="修改" placement="top">
                     <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row)"></el-button>
@@ -92,6 +92,31 @@
         layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
     </el-card>
+    <el-dialog title="详情" :visible.sync="setRightDialogVisible" width="50%" >
+      <el-form :model="cateForm" label-width="100px">
+        <el-form-item label="年级：" >
+            <el-input v-model="cateForm.gradeName" style="width: 100%;outline: none;height: 100%" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="学科：" >
+            <el-input v-model="cateForm.subjectName" style="width: 100%;outline: none;height: 100%" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="班级：" >
+          <el-checkbox-group v-model="classIds">
+            <el-checkbox v-for="item in classOptions"  :label="item.id" style="width: 100%;outline: none;height: 100%" disabled
+            :key="item.id" name="type">{{ item.name }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label="角色：">
+          <el-checkbox-group v-model="chooseRoleNames" style="width: 100%;outline: none;height: 100%" disabled>
+            <el-checkbox v-for="item in tableData" :label="item.id"
+            :key="item.id" name="type">{{ item.roleName }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRightDialogVisible = false">取消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -106,14 +131,18 @@ export default {
         size: 10,
         userName: ''
       },
+      cateForm: {},
       list: [],
       listLoading: true,
       total: 0,
       options: [], // 年级下拉框
       classOptions: [], // 班级下拉框
       roleOptions: [], // 角色下拉框
-      gradeId: null
-
+      gradeId: null,
+      setRightDialogVisible: false,
+      classIds: [],
+      tableData: [],
+      chooseRoleNames: [] // 用户对应的角色名的数组(不支持Object）
     }
   },
   watch: {
@@ -182,6 +211,36 @@ export default {
             this.$message.error('获取角色数据失败！')
           }
         })
+    },
+    showInfo (row) {
+      this.cateForm = row
+      this.userId = row.id
+      this.classIds = row.classIdArray
+      this.$http.get('/system/getAllRole')
+        .then(result => {
+          if (result.data.code === 0) {
+            this.tableData = result.data.data
+          }
+        })
+      this.$http.get('/system/getUseRoleByUserId/' + this.userId)
+        .then(result => {
+          if (result.data.code === 0) {
+            this.chooseRoleNames = result.data.data
+          }
+        })
+
+      // 获取班级
+      this.$http.get('/class/getClassByGradeId/' + row.gradeId).then(result => {
+        if (result.data.code === 0) {
+          const res = result.data.data
+          if (res == undefined || res.length <= 0) {
+            this.classOptions = []
+          } else {
+            this.classOptions = res
+          }
+        }
+      })
+      this.setRightDialogVisible = true
     },
     sexFormatter (row) {
       const sex = row.sex

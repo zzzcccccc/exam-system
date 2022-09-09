@@ -4,7 +4,7 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '' }">用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/user/teacherInfo' }">用户列表</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/user/userInfo' }">用户列表</el-breadcrumb-item>
       <el-breadcrumb-item>用户新增</el-breadcrumb-item>
     </el-breadcrumb>
     <el-form :model="form" ref="form" label-width="100px" :rules="rules">
@@ -53,13 +53,13 @@
       </el-form-item>
       <el-form-item  label="班级：">
         <!-- :label是传回的值  -->
-        <el-checkbox-group v-model="chooseClassNames">
+        <el-checkbox-group v-model="chooseClassIds">
           <el-checkbox v-for="item in classOptions"  @change="val => handleChecked(val,item.id)" :label="item.id"
           :key="item.id" name="type">{{ item.name }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="角色：" prop="chooseRoleNames"  required>
-        <el-checkbox-group v-model="chooseRoleNames">
+      <el-form-item label="角色：" prop="chooseRoleIds"  required>
+        <el-checkbox-group v-model="chooseRoleIds">
           <el-checkbox v-for="item in roleOptions"  @change="val => handleCheckedRole(val,item.id)" :label="item.id"
           :key="item.id" name="type">{{ item.roleName }}</el-checkbox>
         </el-checkbox-group>
@@ -103,12 +103,11 @@ export default {
       subjectOptions: [], // 学科下拉框
       classOptions: [], // 班级多选框数据
       roleOptions: [], // 角色多选框数据
-      // 多选框回显的已经选中点的数据
-      chooseClassNames: [],
-      chooseRoleNames: [],
       // 当前操作后选中的
       classIds: [],
       roleIds: [],
+      chooseClassIds: [],
+      chooseRoleIds: [],
       rules: {
         userName: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
@@ -126,7 +125,7 @@ export default {
         status: [
           { required: true, message: '请选择状态', trigger: 'blur' }
         ],
-        chooseRoleNames: [
+        chooseRoleIds: [
           { required: true, message: '请选择角色', trigger: 'blur' }
         ]
       },
@@ -155,29 +154,25 @@ export default {
       // 获取学科
       this.$http.get('/subject/getSubjectByGradeId/' + this.gradeId).then(result => {
         if (result.data.code === 0) {
+          this.form.subjectId = null
           const res = result.data.data
           if (res == undefined || res.length <= 0) {
             this.subjectOptions = []
-            this.form.subjectId = null
           } else {
             this.subjectOptions = res
           }
-        } else {
-          this.$message.error('查询失败')
         }
       })
       // 获取班级
       this.$http.get('/class/getClassByGradeId/' + this.gradeId).then(result => {
         if (result.data.code === 0) {
+          this.form.classIds = []
           const res = result.data.data
           if (res == undefined || res.length <= 0) {
             this.classOptions = []
-            this.form.classIds = []
           } else {
             this.classOptions = res
           }
-        } else {
-          this.$message.error('查询失败')
         }
       })
     }
@@ -226,7 +221,9 @@ export default {
         if (result.data.code === 0) {
           this.options = result.data.data
         } else {
-          this.$message.error('查询失败')
+          this.$message.error(result.data.msg)
+          this.$store.commit('delToken')
+          this.$router.push('/')
         }
       })
     },
@@ -249,7 +246,7 @@ export default {
       if (val) {
         this.roleIds.push(item)
       } else {
-        this.deleteItemRole(item, this.roles)
+        this.deleteItemRole(item, this.roleIds)
       }
     },
     deleteItemRole (item, listRoles) {

@@ -122,10 +122,14 @@ export default {
         this.roleIds = res.data
         // 获取所有的菜单
         const { data: res1 } = await this.$http.get('/menu/getAllByRole/' + this.roleIds)
-        if (res1.code !== 0) {
-          return this.$message.success(res1.msg)
-        } else {
+        if (res1.code == 0) {
           this.menuList = res1.data
+        } else if (res1.code == this.tokenFail) {
+          this.$store.commit('delToken')
+          this.$router.push('/')
+          return this.$message.error(res1.msg)
+        } else {
+          return this.$message.error(res1.msg)
         }
       }
     },
