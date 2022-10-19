@@ -13,6 +13,7 @@ import PermissionDemo from '../views/system/perListAddTest.vue'
 import MenuInfo from '../views/menu/menuInfo.vue'
 import SubjectInfo from '../views/subject/subjectInfo.vue'
 import ClassInfo from '../views/class/classInfo.vue'
+import TaskInfo from '../views/task/taskInfo.vue'
 import store from '../store'
 import storage from '../model/storage'
 
@@ -114,6 +115,17 @@ const routes = [
       {
         path: '/class/list',
         component: ClassInfo
+      }
+    ]
+  },
+  // 定时任务管理
+  {
+    path: '/task',
+    component: Layout,
+    children: [
+      {
+        path: '/task/all',
+        component: TaskInfo
       }
     ]
   }
