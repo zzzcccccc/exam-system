@@ -26,27 +26,35 @@
                 </el-option>
             </el-select>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="2">
           <el-button type="primary" icon="el-icon-search" @click="getPageSubject()">搜索</el-button>
         </el-col>
-        <el-col :span="3">
-          <el-button type="success" icon="el-icon-plus"   @click="addShow()">新增</el-button>
-        </el-col>
         <el-col :span="4">
-          <el-button type="success" icon="el-icon-plus"   @click="addBatchShow()">批量新增</el-button>
+          <el-button type="success" icon="el-icon-plus"   @click="addShow()">新增</el-button>
         </el-col>
       </el-row>
       <br/>
       <el-table  :data="list" border stripe :header-cell-style="{background:'#eef1f6','text-align':'left'}" >
         <el-table-column type="index" label="序号"  width="55"  align="center"/>
-        <el-table-column prop="name" label="标题"/>
-        <el-table-column prop="gradeName" label="cron表达式" />
-        <el-table-column prop="gradeName" label="描述"/>
-        <el-table-column prop="gradeName" label="请求地址"/>
-        <el-table-column prop="gradeName" label="状态"/>
-        <el-table-column prop="gradeName" label="任务类型"/>
-        <el-table-column prop="createTime" label="上次执行时间" />
-        <el-table-column prop="createTime" label="最近执行时间" />
+        <el-table-column prop="title" label="标题"/>
+        <el-table-column prop="cron" label="cron表达式" />
+        <el-table-column prop="remark" label="描述"/>
+        <el-table-column prop="classPath" label="请求地址"/>
+        <el-table-column  prop="stauts"  label="启用/停止">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.stauts"
+              active-color="#00A854"
+              inactive-color="#F04134"
+              active-value= 0
+              inactive-value= 1
+              @change=changSwitch(scope.row)>
+            </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column prop="type" label="任务类型"/>
+        <el-table-column prop="lastExecutionTime" label="上次执行时间" />
+        <el-table-column prop="latelyExecutionTime" label="最近执行时间" />
         <el-table-column prop="createTime" label="创建时间"/>
         <el-table-column label="操作" width="120px">
             <template slot-scope="scope">
@@ -68,18 +76,20 @@
     </el-card>
     <el-dialog title="新增" :visible.sync="addDialogVisible" width="50%" >
       <el-form :model="subjectInfo" ref="subjectInfo"  :rules="rules"  label-width="100px" >
-        <el-form-item label="学科名称:" prop="name">
+        <el-form-item label="标题:" prop="name">
+          <el-input v-model="subjectInfo.title" ></el-input>
+        </el-form-item>
+        <el-form-item label="cron表达式:" prop="name">
+          <el-input v-model="subjectInfo.cron" ></el-input>
+        </el-form-item>
+        <el-form-item label="描述:" prop="name">
           <el-input v-model="subjectInfo.name" ></el-input>
         </el-form-item>
-        <el-form-item label="年级:" prop="gradeId">
-          <el-select v-model="subjectInfo.gradeId" filterable placeholder="请选择年级">
-                <el-option
-                v-for="item in options"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-                </el-option>
-            </el-select>
+        <el-form-item label="请求地址:" prop="name">
+          <el-input v-model="subjectInfo.name" ></el-input>
+        </el-form-item>
+        <el-form-item label="启用/停止:" prop="gradeId">
+          <el-input v-model="subjectInfo.staus" ></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -87,24 +97,7 @@
         <el-button type="primary" @click="add(subjectInfo)">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="批量新增" :visible.sync="addBatchDialogVisible" width="50%" >
-      <el-form :model="subjectInfo" ref="subjectInfo"  :rules="addBatchRules"  label-width="100px" >
-        <el-form-item label="学科名称:" prop="name">
-          <el-input v-model="subjectInfo.name" ></el-input>
-        </el-form-item>
-        <el-form-item label="年级:" prop="gradeId">
-          <!-- :label是传回的值  -->
-          <el-checkbox-group v-model="chooseGradeIds">
-            <el-checkbox v-for="item in options"  @change="val => handleChecked(val,item.id)" :label="item.id"
-            :key="item.id" name="type">{{ item.name }}</el-checkbox>
-          </el-checkbox-group>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="addBatchDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addBatch(subjectInfo)">确 定</el-button>
-      </span>
-    </el-dialog>
+
     <el-dialog title="编辑" :visible.sync="editDialogVisible" width="50%" >
       <el-form :model="subjectInfo" ref="subjectInfo"  :rules="rules"  label-width="100px" >
         <el-form-item label="学科名称:" prop="name">
@@ -143,7 +136,6 @@ export default {
       list: [],
       options: [], // 年级下拉框
       addDialogVisible: false,
-      addBatchDialogVisible: false,
       editDialogVisible: false,
       subjectInfo: { },
       chooseGradeIds: [], // 用户对应的角色名的数组(不支持Object）
@@ -173,7 +165,7 @@ export default {
   },
   methods: {
     getPageSubject () {
-      this.$http.get('/subject/getPageSubject', {
+      this.$http.get('/cron/getPage', {
         params: this.queryInfo
       }).then(result => {
         if (result.data.code === 0) {
@@ -212,10 +204,6 @@ export default {
       this.subjectInfo = {}
       this.addDialogVisible = true
     },
-    addBatchShow () {
-      this.subjectInfo = {}
-      this.addBatchDialogVisible = true
-    },
     editShow (row) {
       this.subjectInfo = row
       this.editDialogVisible = true
@@ -223,10 +211,7 @@ export default {
     add (subjectInfo) {
       this.$refs.subjectInfo.validate((valid) => { // 开启校验
         if (valid) { // 如果校验通过，请求接口，允许提交表单
-          this.$http.post('subject/add', {
-            name: subjectInfo.name,
-            gradeId: subjectInfo.gradeId
-          })
+          this.$http.post('cron/add', subjectInfo)
             .then(result => {
               if (result.data.code === 0) {
                 this.$message.success(result.data.msg)
@@ -245,32 +230,6 @@ export default {
         }
       })
       this.addDialogVisible = false
-    },
-    addBatch (subjectInfo) {
-      this.$refs.subjectInfo.validate((valid) => { // 开启校验
-        if (valid) { // 如果校验通过，请求接口，允许提交表单
-          this.$http.post('subject/addBatch', {
-            name: subjectInfo.name,
-            chooseGradeIds: this.chooseGradeIds
-          })
-            .then(result => {
-              if (result.data.code === 0) {
-                this.$message.success(result.data.msg)
-                this.getPageSubject()
-                this.addBatchDialogVisible = false
-              } else if (result.data.code === this.tokenFail) {
-                this.$message.error(result.data.msg)
-                this.$store.commit('delToken')
-                this.$router.push('/')
-              } else {
-                this.$message.error(result.data.msg)
-              }
-            })
-        } else { // 校验不通过
-          return false
-        }
-      })
-      this.addBatchDialogVisible = false
     },
     handleChecked (val, item) {
       if (val) {
