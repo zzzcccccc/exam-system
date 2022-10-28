@@ -29,7 +29,7 @@
          <!-- 侧边栏 -->
          <el-aside :width="isCollapse ? '64px' : '200px'">
              <!-- 折叠条 -->
-            <div class="toggle-button"  @click="toggleCollapse()" >|||</div>
+            <div class="toggle-button"  @click="toggleCollapse()" >| | |</div>
             <el-menu background-color="#333744" text-color="#fff"
             active-text-color="#409BFF" :unique-opened="true"
             :collapse="isCollapse" :collapse-transition="false"
@@ -175,9 +175,9 @@ export default {
       background-color:white;
    }
    .toggle-button{
-      background-color: #4A5064;//背景色(浅灰)
-      font-size: 10px;//字体大小10像素
-      line-height: 24px;//行高24像素
+      background-color: #3d445a;//背景色(浅灰)
+      font-size: 15px;//字体大小10像素
+      line-height: 30px;//行高24像素
       color: #fff;//字体颜色白色
       text-align: center;//字体居中
       letter-spacing: 0.2em;//字体之间的距离
