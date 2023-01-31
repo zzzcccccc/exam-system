@@ -14,6 +14,7 @@ import MenuInfo from '../views/menu/menuInfo.vue'
 import SubjectInfo from '../views/subject/subjectInfo.vue'
 import ClassInfo from '../views/class/classInfo.vue'
 import TaskInfo from '../views/task/taskInfo.vue'
+import UplodFile from '../views/file/uploadPage.vue'
 import store from '../store'
 import storage from '../model/storage'
 
@@ -126,6 +127,17 @@ const routes = [
       {
         path: '/task/all',
         component: TaskInfo
+      }
+    ]
+  },
+  // 题库管理
+  {
+    path: '/topic',
+    component: Layout,
+    children: [
+      {
+        path: '/topic/file',
+        component: UplodFile
       }
     ]
   }

@@ -54,8 +54,8 @@ const store = new Vuex.Store({
     },
     delAll (state) {
       state.token = ''
-      state.permission= []
-      state.role= []
+      state.permission = []
+      state.role = []
       storage.removeAll()
     },
     // 可选
