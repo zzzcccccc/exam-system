@@ -1,5 +1,5 @@
 <template>
     <div>
-        <h3>welcone  xxx的介绍</h3>
+        <h2> welcone  xxx的介绍</h2>
     </div>
 </template>

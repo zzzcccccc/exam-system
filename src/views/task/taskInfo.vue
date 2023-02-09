@@ -29,7 +29,7 @@
         <el-col :span="2">
           <el-button type="primary" icon="el-icon-search" @click="getPageSubject()">搜索</el-button>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="2">
           <el-button type="success" icon="el-icon-plus"   @click="addShow()">新增</el-button>
         </el-col>
       </el-row>

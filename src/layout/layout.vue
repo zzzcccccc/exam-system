@@ -3,13 +3,13 @@
     <el-container class="homeContainer">
         <!-- 头部区 -->
         <el-header>
-         <div>
-           <span>后台管理系统</span>
+         <div class="menu-name">
+           <span>EXAM-SYSTEM</span>
          </div>
         <div class="right-menu">
           <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
             <div class="avatar-wrapper">
-              <span style="color:white">{{username}}</span>
+              <span style="color:white;font-weight: bold;">{{username}}</span>
               <i class="el-icon-caret-bottom" />
             </div>
             <el-dropdown-menu slot="dropdown">
@@ -27,7 +27,7 @@
         <!-- 页面主体区域 -->
          <el-container>
          <!-- 侧边栏 -->
-         <el-aside :width="isCollapse ? '64px' : '200px'">
+         <el-aside :width="isCollapse ? '64px' : '155px'">
              <!-- 折叠条 -->
             <div class="toggle-button"  @click="toggleCollapse()" >| | |</div>
             <el-menu background-color="#333744" text-color="#fff"
@@ -175,13 +175,21 @@ export default {
       background-color:white;
    }
    .toggle-button{
-      background-color: #3d445a;//背景色(浅灰)
+      //background-color: #3d445a;//背景色(浅灰)
       font-size: 15px;//字体大小10像素
-      line-height: 30px;//行高24像素
+      line-height: 25px;//行高24像素
       color: #fff;//字体颜色白色
       text-align: center;//字体居中
       letter-spacing: 0.2em;//字体之间的距离
       cursor: pointer;//鼠标的形状（手形）
+   }
+   .menu-name{
+    color: #fff;//字体颜色白色
+    text-align: center;//字体居中
+    margin-left : 20px;//左间距
+    font-weight: bold; //加粗
+    letter-spacing: 0.2em;//字体之间的距离
+    font-size: 15px;//字体大小10像素
    }
   .right-menu {
     float: right;

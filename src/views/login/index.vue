@@ -2,9 +2,9 @@
     <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
         <div class="title-container">
-            <h3 class="title">成绩管理系统</h3>
+            <h3 class="title">EXAM 管理系统</h3>
         </div>
-        <el-form-item label="用户名" prop="userName">
+        <el-form-item  label="用户名" prop="userName">
             <el-input ref="userName" v-model="loginForm.userName" placeholder="用户名" name="userName" type="text" tabindex="1" auto-complete="on"/>
         </el-form-item>
        <el-form-item label="密码" prop="password">
@@ -98,7 +98,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background-image: url(../../assets/img/loginBj.jpg);
+    background-image: url(../../assets/img/350.jpg);
     background-size: 100%;
     opacity:0.8;/*透明度*/
 }
@@ -114,10 +114,10 @@ export default {
     position: absolute;/*position 属性规定元素的定位类型；absolute生成绝对定位的因素*/
     left: 50%;
     top: 50%;
-    width: 350px;
+    width: 300px;
     margin: -190px 0 0 -190px;
     border-radius: 15px;/*角边弧度*/
-    background: rgba(127, 194, 228, 0.521);
+    background: rgba(82, 128, 151, 0.521);
     overflow: hidden;
 }
 .login-form {/*输入框的内边距*/
