@@ -15,6 +15,7 @@ import SubjectInfo from '../views/subject/subjectInfo.vue'
 import ClassInfo from '../views/class/classInfo.vue'
 import TaskInfo from '../views/task/taskInfo.vue'
 import UplodFile from '../views/file/uploadPage.vue'
+import CreateTopic from '../views/question/create.vue'
 import store from '../store'
 import storage from '../model/storage'
 
@@ -138,6 +139,10 @@ const routes = [
       {
         path: '/topic/file',
         component: UplodFile
+      },
+      {
+        path: '/topic/create',
+        component: CreateTopic
       }
     ]
   }

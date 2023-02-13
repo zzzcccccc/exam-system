@@ -4,15 +4,21 @@
         <div class="title-container">
             <h3 class="title">EXAM 管理系统</h3>
         </div>
-        <el-form-item  label="用户名" prop="userName">
-            <el-input ref="userName" v-model="loginForm.userName" placeholder="用户名" name="userName" type="text" tabindex="1" auto-complete="on"/>
+        <el-form-item prop="userName">
+          <span slot="label">
+            <span style="color: white">用户名</span>
+          </span>
+          <el-input ref="userName" v-model="loginForm.userName" placeholder="用户名" name="userName" type="text" tabindex="1" auto-complete="on"/>
         </el-form-item>
-       <el-form-item label="密码" prop="password">
-            <el-input ref="password" v-model="loginForm.password" placeholder="密码" name="password" type="text" tabindex="1" auto-complete="on"/>
+        <el-form-item prop="password">
+          <span slot="label">
+            <span style="color: white">密码</span>
+          </span>
+          <el-input ref="password" v-model="loginForm.password" placeholder="密码" name="password" type="text" tabindex="1" auto-complete="on"/>
         </el-form-item>
         <el-form-item class="login_btn">
-            <el-button type="primary" @click="submitForm('loginForm')">提交</el-button>
-            <el-button @click="resetLoginForm('loginForm')">重置</el-button>
+            <el-button type="primary" @click="submitForm('loginForm')">登录</el-button>
+            <el-button type="goon" @click="resetLoginForm('loginForm')">重置</el-button>
         </el-form-item>
     </el-form>
     </div>
@@ -98,7 +104,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background-image: url(../../assets/img/350.jpg);
+    background-image: url(../../assets/img/login.png);
     background-size: 100%;
     opacity:0.8;/*透明度*/
 }
@@ -117,24 +123,27 @@ export default {
     width: 300px;
     margin: -190px 0 0 -190px;
     border-radius: 15px;/*角边弧度*/
-    background: rgba(82, 128, 151, 0.521);
+    background: rgba(6, 43, 167, 0.521);
     overflow: hidden;
 }
 .login-form {/*输入框的内边距*/
     padding: 30px 30px;
 }
-.login-btn {
+.login_btn {
     text-align: left;
 }
-.login-btn button {/*登录按钮样式*/
+ .el-button--primary {/*登录按钮样式*/
+    color: white;
+    font-weight: bold;
+    background-color:rgb(148, 197, 238);
+    border-color: rgb(148, 197, 238);
     width: 50%;
-    height: 35px;
-    margin-bottom: 5px;
-}
-.login-tips {
-    font-size: 12px;
-    line-height: 30px;
-    color: #fff;
-}
-/*我先把登录和取消两个按钮并排排列，还没实现*/
+    height: 50%;
+    margin-bottom: 10px;
+  }
+  /* .el-button--primary:hover {
+    color: rgb(246, 241, 248);
+    background-color: rgb(198, 139, 223);
+    border-color: rgb(198, 139, 223);
+  } */
 </style>

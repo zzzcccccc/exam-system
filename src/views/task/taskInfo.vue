@@ -3,8 +3,8 @@
     <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>定时任务管理</el-breadcrumb-item>
       <el-breadcrumb-item>定时任务</el-breadcrumb-item>
+      <el-breadcrumb-item>定时器详情</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图 -->
      <el-card>
