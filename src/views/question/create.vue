@@ -7,25 +7,32 @@
           :rules="rules"
           class="form"
         >
+        <h4 class="card-label">是否生成试卷</h4>
+          <div class="card-panel_1">
+            <div class="settings-wrap" style="width: 20%">
+              <input type="radio" name="radios" value="1" v-model="form.check"><label>是</label>
+              <input type="radio" name="radios" value="2"   v-model="form.check"><label>否</label>
+            </div>
+          </div>
           <h4 class="card-label">设置任务</h4>
           <div class="card-panel">
             <div class="settings-wrap" style="width: 18%">
               <span class="content-label">选择年级</span>
               <el-form-item prop="gradeId">
+                <!--  添加multiple 属性可选择多个-->
                 <el-select
-                  v-model="form.gradeId"
-                  multiple
+                  v-model="gradeId"
                   filterable
                   allow-create
                   default-first-option
                   placeholder="请选择年级"
                 >
-                  <el-option
-                    v-for="item in roles"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
+                <el-option
+                  v-for="item in options"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                />
                 </el-select>
               </el-form-item>
             </div>
@@ -33,23 +40,42 @@
               <span class="content-label">选择科目</span>
               <el-form-item prop="subjectId">
                 <el-select
-                  v-model="form.gradeId"
-                  multiple
+                  v-model="subjectId"
                   filterable
                   allow-create
                   default-first-option
                   placeholder="请选择科目"
                 >
                   <el-option
-                    v-for="item in roles"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in subjectOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
                   />
                 </el-select>
               </el-form-item>
             </div>
-            <div class="settings-wrap" style="width: 18%">
+            <div v-if="form.check == '1'" class="settings-wrap"  style="width: 18%" >
+                <span class="content-label">选择班级</span>
+                <el-select
+                  clearable
+                  v-model="chooseClassIds"
+                  multiple
+                  collapse-tags
+                  filterable
+                  allow-create
+                  default-first-option
+                  placeholder="请选择班级"
+                >
+                  <el-option
+                    v-for="item in classOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  />
+                </el-select>
+            </div>
+            <div v-if="form.check == '1'" class="settings-wrap" style="width: 18%">
               <span class="content-label">截止时间</span>
               <el-form-item prop="deadline">
                 <el-date-picker
@@ -61,12 +87,12 @@
               </el-form-item>
             </div>
           </div>
-          <h4 class="card-label">试卷标题</h4>
-          <div class="card-panel">
+          <h4 v-if="form.check=='1'" class="card-label">试卷标题</h4>
+          <div v-if="form.check=='1'"  class="card-panel">
             <div class="settings-wrap" style="width: 40%">
-              <el-form-item prop="title">
+              <el-form-item prop="headline">
                 <el-input
-                  v-model="form.title"
+                  v-model="form.headline"
                   type="text"
                   placeholder="请输入试卷标题（1-20个字）"
                   maxlength="20"
@@ -91,7 +117,7 @@
               style="border-color: #2A82E4; color: #2A82E4"
               @click="addQuestion(item.typeId)"
             >
-              <svg-icon :icon-class="item.icon" />
+              <!-- <svg-icon :icon-class="item.icon" /> -->
               {{ item.typeName }}
             </el-button>
           </div>
@@ -120,47 +146,93 @@ export default {
   },
   data () {
     return {
-      roles: [],
+      options: [], // 年级下拉框
+      subjectOptions: [],
+      chooseClassIds: [], // 选择的班级
+      classOptions: [], // 班级多选框接口返回的数据
       dialogVisible: false,
       loading: false,
       questionId: 0,
       form: {
-        headline: '',
-        subjectId: 0, // 学科id
-        gradeId: 0, // 年级id
+        check: 1,
         deadline: '', // 截止时间
         questions: []
       },
+      gradeId: null, // 年级ID
+      subjectId: null, // 学科ID
       questionType: [],
       rules: {
-        subjectId: [{
-          required: true,
-          message: '请选择学科',
-          trigger: 'blur'
-        }],
-        gradeId: [{
-          required: true,
-          message: '请选择年级',
-          trigger: 'blur'
-        }],
-        deadline: [{
-          required: true,
-          message: '请选择截止时间',
-          trigger: 'blur'
-        }],
-        headline: [{
-          required: true,
-          message: '请输入试卷标题（1-20个字）',
-          trigger: 'blur'
-        }]
+        // subjectId: [{
+        //   required: true,
+        //   message: '请选择学科',
+        //   trigger: 'blur'
+        // }],
+        // gradeId: [{
+        //   required: true,
+        //   message: '请选择年级',
+        //   trigger: 'blur'
+        // }],
+        // deadline: [{
+        //   required: true,
+        //   message: '请选择截止时间',
+        //   trigger: 'blur'
+        // }],
+        // headline: [{
+        //   required: true,
+        //   message: '请输入试卷标题（1-20个字）',
+        //   trigger: 'blur'
+        // }]
       }
     }
   },
   created () {
+    this.getAllGrade()
     this.getQuestionType()
   },
-  methods: {
+  watch: {
+    gradeId () {
+      // 获取学科
+      this.$http.get('/subject/getSubjectByGradeId/' + this.gradeId).then(result => {
+        if (result.data.code === 0) {
+          this.subjectId = null
+          const res = result.data.data
+          if (res == undefined || res.length <= 0) {
+            this.subjectOptions = []
+          } else {
+            this.subjectOptions = res
+          }
+        } else {
+          this.$store.commit('delToken')
+          this.$router.push('/')
+        }
+      })
 
+      // 获取班级
+      this.chooseClassIds = []
+      this.$http.get('/class/getClassByGradeId/' + this.gradeId).then(result => {
+        if (result.data.code === 0) {
+          const res = result.data.data
+          if (res == undefined || res.length <= 0) {
+            this.classOptions = []
+          } else {
+            this.classOptions = res
+          }
+        }
+      })
+    }
+  },
+  methods: {
+    getAllGrade () {
+      this.$http.get('/subject/getAllGrade').then(result => {
+        if (result.data.code === 0) {
+          this.options = result.data.data
+        } else {
+          this.$message.error(result.data.msg)
+          this.$store.commit('delToken')
+          this.$router.push('/')
+        }
+      })
+    },
     getQuestionType () {
       this.questionType = [{ typeId: 1, typeName: '单选题' }, { typeId: 2, typeName: '多选题' }, { typeId: 3, typeName: '填空题' },
         { typeId: 4, typeName: '简答题' }, { typeId: 5, typeName: '判断题' }]
@@ -168,7 +240,7 @@ export default {
     // 从试卷模板vue添加题目方法
     addQuestion (typeId) {
       const question = {
-        id: this.questionId,
+        difficult: null,
         quesTypeId: typeId,
         title: '',
         score: 0,
@@ -234,8 +306,13 @@ export default {
         form.questions.forEach(function (question) {
           question.answer = JSON.stringify(question.answer)
           question.content = JSON.stringify(question.content)
+          question.difficult = JSON.stringify(question.difficult)
         })
-        this.$http.post('/vQuestion/add',
+        form.gradeId = this.gradeId
+        form.subjectId = this.subjectId
+        form.classIds = this.chooseClassIds
+
+        this.$http.post('vQuestion/add',
           form).then((res) => {
           // this.loading = false
           // const params = {
@@ -246,8 +323,10 @@ export default {
           // crudList.remind(params).then(() => {
           //   this.$message.success('提醒成功~')
           // })
-          // this.$router.push('/exam/index')
+          this.$message.success('添加成功~')
+          // this.$router.go(0)
         }).catch(() => {
+          this.form.splice(0)
           this.loading = false
         })
       })
@@ -260,14 +339,24 @@ export default {
     .card-label {
       margin: 30px 0 15px;
     }
-    .card-panel {
-      display: flex;
-      flex-direction: row;
-      padding: 17px 15px 0;
-      color: #666;
-      box-shadow: 0 0 3px 1px #e7e7e7;
-      border-color: #e7e7e7;
-
+  .card-panel {
+    display: flex;
+    flex-direction: row;
+    padding: 17px 15px 0px;
+    color: #666;
+    box-shadow: 0 0 3px 1px #e7e7e7;
+    border-color: #e7e7e7;
+      .settings-wrap {
+        margin-right: 4%;
+      }
+    }
+    .card-panel_1 {
+    display: flex;
+    flex-direction: row;
+    padding: 10px 15px 10px;
+    color: #666;
+    box-shadow: 0 0 3px 1px #e26e21;
+    border-color: #e7e7e7;
       .settings-wrap {
         margin-right: 4%;
       }
@@ -275,6 +364,14 @@ export default {
     .content-label {
       display: block;
       padding-bottom: 5px;
+    }
+    .checkbox-tabel {
+      display: flex;
+    flex-direction: row;
+    padding: 10px 15px 10px;
+    color: #666;
+    box-shadow: 0 0 1px 1px #e7e7e7;
+    border-color: #e7e7e7;
     }
     .question-type {
       margin-top: 20px;

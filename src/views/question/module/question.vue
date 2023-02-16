@@ -83,13 +83,13 @@
       <!-- 打分 星标 -->
       <el-form-item>
         <div class="rate">
-          <span v-if="showText" class="text">{{difficult}}分</span>
+          <span v-if="showText" class="text">{{question.difficult}}分</span>
           <div class="star-wrap">
             <i> 难度&nbsp;:&nbsp;&nbsp;</i>
             <i
               v-for="(i, index) in 5"
               :key="index"
-              @mouseenter="disabled ? '' : difficult=i"
+              @mouseenter="disabled ? '' :  question.difficult=i"
               :class="getClass(i)"
             >
             </i>
@@ -122,7 +122,7 @@ export default {
   },
   data () {
     return {
-      difficult: ''// 星星的数量
+      //  difficult: ''// 星星的数量
     }
   },
   methods: {
@@ -133,8 +133,7 @@ export default {
       question.answer.splice(0)
     },
     getClass (i) {
-      console.log(this.difficult)
-      return i <= this.difficult ? 'icon-star' : 'icon-star-o'
+      return i <= this.question.difficult ? 'icon-star' : 'icon-star-o'
     }
 
   }

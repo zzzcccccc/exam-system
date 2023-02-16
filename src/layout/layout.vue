@@ -27,7 +27,7 @@
         <!-- 页面主体区域 -->
          <el-container>
          <!-- 侧边栏 -->
-         <el-aside :width="isCollapse ? '64px' : '155px'">
+         <el-aside :width="isCollapse ? '64px' : '180px'">
              <!-- 折叠条 -->
             <div class="toggle-button"  @click="toggleCollapse()" >| | |</div>
             <el-menu background-color="#333744" text-color="#fff"
