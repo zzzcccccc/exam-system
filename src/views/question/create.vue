@@ -324,7 +324,7 @@ export default {
           //   this.$message.success('提醒成功~')
           // })
           this.$message.success('添加成功~')
-          // this.$router.go(0)
+          this.$router.push('/topic/list')
         }).catch(() => {
           this.form.splice(0)
           this.loading = false

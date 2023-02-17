@@ -56,14 +56,14 @@
       </el-row>
       <br/>
       <!-- 带边框、斑马纹  v-loading="listLoading" 预加载-->
-      <el-table  v-loading="listLoading"  :data="list" border stripe>
-        <el-table-column type="index" label="序号"  align="center" width="49px"/>
+      <el-table  v-loading="listLoading" tooltip-effect="dark"  :data="list" border stripe>
+        <el-table-column type="index"  align="center"/>
         <el-table-column prop="userName" label="用户名"/>
         <el-table-column prop="realName" label="真实姓名" />
-        <el-table-column prop="sex" label="性别"  width="50px" :formatter="sexFormatter" />
+        <el-table-column prop="sex" label="性别" :formatter="sexFormatter" />
         <el-table-column prop="phone" label="手机号"/>
         <el-table-column prop="gradeName" label="年级"/>
-        <el-table-column prop="createTime" label="创建时间"/>
+        <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip />
         <el-table-column label="状态"  width="70px" prop="status">
           <template  slot-scope="scope">
            <el-tag :type="(scope.row.status == '1' ? 'success' :  'danger')">
@@ -180,7 +180,6 @@ export default {
       }).then(result => {
         // this.list = result.data;
         if (result.data.code === 0) {
-          console.log(111)
           const res = result.data.data
           this.list = res.records
           this.total = res.total

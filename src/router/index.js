@@ -14,6 +14,7 @@ import MenuInfo from '../views/menu/menuInfo.vue'
 import SubjectInfo from '../views/subject/subjectInfo.vue'
 import ClassInfo from '../views/class/classInfo.vue'
 import TaskInfo from '../views/task/taskInfo.vue'
+import ListTopic from '../views/question/list.vue'
 import UplodFile from '../views/file/uploadPage.vue'
 import CreateTopic from '../views/question/create.vue'
 import store from '../store'
@@ -136,6 +137,10 @@ const routes = [
     path: '/topic',
     component: Layout,
     children: [
+      {
+        path: '/topic/list',
+        component: ListTopic
+      },
       {
         path: '/topic/file',
         component: UplodFile
