@@ -14,28 +14,28 @@
               <input type="radio" name="radios" value="2"   v-model="form.check"><label>否</label>
             </div>
           </div>
-          <h4 class="card-label">设置任务</h4>
-          <div class="card-panel">
-            <div class="settings-wrap" style="width: 18%">
-              <span class="content-label">选择年级</span>
-              <el-form-item prop="gradeId">
-                <!--  添加multiple 属性可选择多个-->
-                <el-select
-                  v-model="gradeId"
-                  filterable
-                  allow-create
-                  default-first-option
-                  placeholder="请选择年级"
-                >
-                <el-option
-                  v-for="item in options"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-                </el-select>
-              </el-form-item>
-            </div>
+        <h4 class="card-label">设置任务</h4>
+        <div class="card-panel">
+          <div class="settings-wrap" style="width: 18%">
+            <span class="content-label">选择年级</span>
+            <el-form-item prop="gradeId">
+              <!--  添加multiple 属性可选择多个-->
+              <el-select
+                v-model="gradeId"
+                filterable
+                allow-create
+                default-first-option
+                placeholder="请选择年级"
+              >
+              <el-option
+                v-for="item in options"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              />
+              </el-select>
+            </el-form-item>
+          </div>
             <div  class="settings-wrap" style="width: 18%">
               <span class="content-label">选择科目</span>
               <el-form-item prop="subjectId">
@@ -240,6 +240,7 @@ export default {
     // 从试卷模板vue添加题目方法
     addQuestion (typeId) {
       const question = {
+        id: this.questionId,
         difficult: null,
         quesTypeId: typeId,
         title: '',

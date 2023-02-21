@@ -17,6 +17,7 @@ import TaskInfo from '../views/task/taskInfo.vue'
 import ListTopic from '../views/question/list.vue'
 import UplodFile from '../views/file/uploadPage.vue'
 import CreateTopic from '../views/question/create.vue'
+import EditTopic from '../views/question/editQues.vue'
 import store from '../store'
 import storage from '../model/storage'
 
@@ -148,6 +149,10 @@ const routes = [
       {
         path: '/topic/create',
         component: CreateTopic
+      },
+      {
+        path: '/topic/editQues',
+        component: EditTopic
       }
     ]
   }
