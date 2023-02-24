@@ -159,8 +159,9 @@ export default {
         { label: '权限标识', prop: 'permission' },
         { label: '访问路径', prop: 'path' },
         { label: '菜单icon', prop: 'icon', width: '130px' },
-        { label: '菜单类型', prop: 'showFlag', type: 'template', template: 'isok', width: '60' },
+        { label: '类型', prop: 'showFlag', type: 'template', template: 'isok', width: '60' },
         { label: '等级', prop: 'level', type: 'template', template: 'level', width: '60' },
+        { label: '排序号', prop: 'sort', width: '70' },
         { label: '创建时间', prop: 'createTime' },
         { label: '操作', type: 'template', width: '180', template: 'opt' }
       ],

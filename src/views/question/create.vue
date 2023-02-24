@@ -162,26 +162,16 @@ export default {
       subjectId: null, // 学科ID
       questionType: [],
       rules: {
-        // subjectId: [{
-        //   required: true,
-        //   message: '请选择学科',
-        //   trigger: 'blur'
-        // }],
-        // gradeId: [{
-        //   required: true,
-        //   message: '请选择年级',
-        //   trigger: 'blur'
-        // }],
-        // deadline: [{
-        //   required: true,
-        //   message: '请选择截止时间',
-        //   trigger: 'blur'
-        // }],
-        // headline: [{
-        //   required: true,
-        //   message: '请输入试卷标题（1-20个字）',
-        //   trigger: 'blur'
-        // }]
+        subjectId: [{
+          required: true,
+          message: '请选择学科',
+          trigger: 'blur'
+        }],
+        gradeId: [{
+          required: true,
+          message: '请选择年级',
+          trigger: 'blur'
+        }]
       }
     }
   },
@@ -268,7 +258,6 @@ export default {
         return
       }
       const form = JSON.parse(JSON.stringify(this.form))
-      console.log(form)
       let isSubmit = true
       let message = ''
       this.loading = true

@@ -39,7 +39,7 @@
         <el-table-column prop="title" label="标题"/>
         <el-table-column prop="cron" label="cron表达式" />
         <el-table-column prop="remark" label="描述"/>
-        <el-table-column prop="classPath" label="请求地址"/>
+        <el-table-column prop="classPath" label="请求地址" show-overflow-tooltip />
         <el-table-column  prop="stauts"  label="启用/停止">
           <template slot-scope="scope">
             <el-switch
@@ -53,9 +53,9 @@
           </template>
         </el-table-column>
         <el-table-column prop="type" label="任务类型"/>
-        <el-table-column prop="lastExecutionTime" label="上次执行时间" />
-        <el-table-column prop="latelyExecutionTime" label="最近执行时间" />
-        <el-table-column prop="createTime" label="创建时间"/>
+        <el-table-column prop="lastExecutionTime" label="上次执行时间" show-overflow-tooltip />
+        <el-table-column prop="latelyExecutionTime" label="最近执行时间"  show-overflow-tooltip index=""/>
+        <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip/>
         <el-table-column label="操作" width="120px">
             <template slot-scope="scope">
                 <!-- 放置修改、删除按钮 -->

@@ -18,6 +18,10 @@ import ListTopic from '../views/question/list.vue'
 import UplodFile from '../views/file/uploadPage.vue'
 import CreateTopic from '../views/question/create.vue'
 import EditTopic from '../views/question/editQues.vue'
+
+import ListPaper from '../views/paper/list.vue'
+import CreatePaper from '../views/paper/create.vue'
+
 import store from '../store'
 import storage from '../model/storage'
 
@@ -153,6 +157,21 @@ const routes = [
       {
         path: '/topic/editQues',
         component: EditTopic
+      }
+    ]
+  },
+  // 试卷管理
+  {
+    path: '/exam',
+    component: Layout,
+    children: [
+      {
+        path: '/exam/paper',
+        component: ListPaper
+      },
+      {
+        path: '/paper/create',
+        component: CreatePaper
       }
     ]
   }
