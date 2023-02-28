@@ -60,7 +60,7 @@
         <el-table-column type="index"  align="center"/>
         <el-table-column prop="userName" label="用户名"/>
         <el-table-column prop="realName" label="真实姓名" />
-        <el-table-column prop="sex" label="性别" :formatter="sexFormatter" />
+        <el-table-column prop="sex" label="性别" width="70px" :formatter="sexFormatter" />
         <el-table-column prop="phone" label="手机号"/>
         <el-table-column prop="gradeName" label="年级"/>
         <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip />

@@ -17,7 +17,7 @@
       <el-table :data="list" border stripe>
         <el-table-column type="index" label="序号"  width="70"  align="center"/>
         <el-table-column prop="role" label="角色标识"/>
-        <el-table-column prop="roleName" label="角色名称"/>
+        <el-table-column  prop="roleName" label="角色名称"/>
         <el-table-column prop="createTime" label="创建时间"/>
         <el-table-column label="操作" width="280px">
             <template slot-scope="scope">
@@ -44,8 +44,8 @@
         <el-form-item label="角色标识:">
           <el-input v-model="roleForm.role" style="width: 100%;outline: none;height: 100%" disabled></el-input>
         </el-form-item>
-        <el-form-item label="角色名称:">
-          <el-input v-model="roleForm.roleName"></el-input>
+        <el-form-item label="角色名称:" prop="roleName">
+          <el-input v-model="roleForm.roleName"  placeholder="请输入角色名称（1-20个字）"  maxlength="20" show-word-limit ></el-input>
         </el-form-item>
          <el-form-item label="创建时间:">
           <el-input v-model="roleForm.createTime" style="width: 100%;outline: none;height: 100%" disabled></el-input>
@@ -62,7 +62,8 @@
           <el-input v-model="roleForm.role" ></el-input>
         </el-form-item>
         <el-form-item label="角色名称:" prop="roleName">
-          <el-input v-model="roleForm.roleName" ></el-input>
+          <el-input v-model="roleForm.roleName"  placeholder="请输入角色名称（1-20个字）"
+                  maxlength="20" show-word-limit></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -104,9 +105,6 @@ export default {
         role: [
           { required: true, message: '请输入角色标识', trigger: 'blur' },
           { pattern: /^[^\u4e00-\u9fa5]+$/, message: '不能包含汉字' }
-        ],
-        roleName: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' }
         ]
       }
     }
@@ -192,7 +190,7 @@ export default {
       this.setMenuDialogVisible = false
     },
     showEditDialog (row) {
-      this.roleForm = row
+      this.roleForm = JSON.parse(JSON.stringify(row))
       this.editDialogVisible = true
     },
     editRole () {
@@ -237,6 +235,7 @@ export default {
       })
     },
     showAddRoleDialog () {
+      this.roleForm = {}
       this.addDialogVisible = true
     },
     addRole (roleForm) {

@@ -53,12 +53,12 @@
       </el-form-item>
       <el-form-item  label="班级：">
         <!-- :label是传回的值  -->
-        <el-checkbox-group v-model="chooseClassIds">
+        <el-checkbox-group v-model="chooseClassIds" >
           <el-checkbox v-for="item in classOptions"  @change="val => handleChecked(val,item.id)" :label="item.id"
           :key="item.id" name="type">{{ item.name }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="角色：" prop="chooseRoleIds"  required>
+      <el-form-item label="角色：" prop="roleIds" >
         <el-checkbox-group v-model="chooseRoleIds">
           <el-checkbox v-for="item in roleOptions"  @change="val => handleCheckedRole(val,item.id)" :label="item.id"
           :key="item.id" name="type">{{ item.roleName }}</el-checkbox>
@@ -124,9 +124,6 @@ export default {
         ],
         status: [
           { required: true, message: '请选择状态', trigger: 'blur' }
-        ],
-        chooseRoleIds: [
-          { required: true, message: '请选择角色', trigger: 'blur' }
         ]
       },
       sexEnum: [
@@ -183,6 +180,20 @@ export default {
   },
   methods: {
     submitForm () {
+      this.isSubmit = true
+      if (this.chooseRoleIds === null || this.chooseRoleIds == '') {
+        this.isSubmit = false
+        this.message = '请选择角色！'
+      }
+      if (!this.isSubmit) {
+        this.$notify({
+          title: '警告',
+          message: this.message,
+          type: 'warning'
+        })
+        return
+      }
+
       this.$refs.form.validate((valid) => { // 开启校验
         if (valid) {
           this.form.gradeId = this.gradeId

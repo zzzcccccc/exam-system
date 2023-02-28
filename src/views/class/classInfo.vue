@@ -212,7 +212,7 @@ export default {
       this.addBatchDialogVisible = true
     },
     editShow (row) {
-      this.subjectInfo = row
+      this.subjectInfo = JSON.parse(JSON.stringify(row))
       this.editDialogVisible = true
     },
     add (subjectInfo) {

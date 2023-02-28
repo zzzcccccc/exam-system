@@ -57,7 +57,7 @@
           :key="item.id" name="type">{{ item.name }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="角色：" prop="chooseRoleIds">
+      <el-form-item label="角色：" v-if="role.indexOf('teacher') > -1 || role.indexOf('admin') > -1" prop="chooseRoleIds">
         <el-checkbox-group v-model="chooseRoleIds">
           <el-checkbox v-for="item in roleOptions"  @change="val => handleCheckedRole(val,item.id)" :label="item.id"
           :key="item.id" name="type">{{ item.roleName }}</el-checkbox>
@@ -81,6 +81,7 @@
 export default ({
   data () {
     return {
+      role: this.$store.getters.getRole,
       tokenFail: this.$store.state.tokenFail,
       form: {
         id: null,
@@ -196,6 +197,20 @@ export default ({
   },
   methods: {
     submitForm () {
+      this.isSubmit = true
+      if (this.chooseRoleIds === null || this.chooseRoleIds == '') {
+        this.isSubmit = false
+        this.message = '请选择角色！'
+      }
+      if (!this.isSubmit) {
+        this.$notify({
+          title: '警告',
+          message: this.message,
+          type: 'warning'
+        })
+        return
+      }
+
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.form.gradeId = this.gradeId
@@ -206,6 +221,8 @@ export default ({
               if (result.data.code === 0) {
                 this.$message.success(result.data.msg)
                 this.$router.back()
+              } else if (result.data.code === 1) {
+                this.$message.error(result.data.msg)
               } else if (result.data.code === this.tokenFail) {
                 this.$message.error(result.data.msg)
                 this.$store.commit('delToken')

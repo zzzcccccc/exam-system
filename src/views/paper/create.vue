@@ -33,7 +33,7 @@
               <span class="content-label">选择学科</span>
               <el-form-item prop="subjectId">
                 <el-select
-                  v-model="subjectId"
+                  v-model="form.subjectId"
                   filterable
                   allow-create
                   default-first-option
@@ -52,7 +52,7 @@
                 <span class="content-label">选择班级</span>
                 <el-select
                   clearable
-                  v-model="chooseClassIds"
+                  v-model="form.chooseClassIds"
                   multiple
                   collapse-tags
                   filterable
@@ -72,7 +72,7 @@
               <span class="content-label">截止时间</span>
               <el-form-item prop="deadline">
                 <el-date-picker
-                  v-model="deadline"
+                  v-model="form.deadline"
                   type="datetime"
                   placeholder="选择日期时间"
                   value-format="yyyy-MM-dd HH:mm:ss"
@@ -82,18 +82,28 @@
           </div>
           <h4 class="card-label">试卷标题</h4>
           <div class="card-panel">
-            <div class="settings-wrap" style="width: 40%">
+            <div class="settings-wrap" style="width: 100%">
               <el-form-item prop="headline">
                 <el-input
-                  v-model="headline"
+                  v-model="form.headline"
                   type="text"
-                  placeholder="请输入试卷标题（1-20个字）"
-                  maxlength="20"
+                  placeholder="请输入试卷标题（1-25个字）"
+                  maxlength="25"
                   show-word-limit
                 />
               </el-form-item>
+              <div class="settings-wrap-else" style="width: 100%">
+                <questionVue
+                  v-for="(item, index)  in form.questions"
+                  :key="index"
+                  :question="item"
+                  class="question-content"
+                  @removeQuestion="removeQuestion"
+                 />
+              </div>
+
             </div>
-            <div class="settings-wrap" style="width: 40%">
+            <div class="settings-wrap" style="width: 10%">
                 <el-button
                 type="success"
                 class="button1"
@@ -112,25 +122,32 @@
         </el-form>
       </div>
       <!-- 添加题目 -->
-      <el-dialog title="添加题目" :visible.sync="setQuesDialogFlag" width="60%" >
-        <h3>eeeeeee</h3>
-
-        <el-col :span="6">
-            <el-select v-model="queryInfo.paperType"  clearable @clear="listAllBlog()" placeholder="请选择题目类型">
-            <el-option
-                v-for="item in quesTypeOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-            </el-option>
-            </el-select>
-        </el-col>
-        <el-col :span="3">
-            <el-button  icon="el-icon-search" @click="listAllBlog()"></el-button>
-        </el-col>
-
-        <el-table :data="questList" tooltip-effect="dark"  border stripe>
-        <el-table-column type="index"></el-table-column>
+      <el-dialog title="添加题目" :visible.sync="setQuesDialogFlag" width="70%" >
+        <el-row>
+          <el-col :span="6">
+              <el-select v-model="queryInfo.paperType"  clearable @clear="getAllQues()" placeholder="请选择题目类型">
+              <el-option
+                  v-for="item in quesTypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+              </el-option>
+              </el-select>
+          </el-col>
+          <el-col :span="3">
+              <el-button  icon="el-icon-search" @click="getAllQues()"></el-button>
+          </el-col>
+        </el-row>
+        <br/>
+        <el-table
+          :data="questList"
+          tooltip-effect="dark"
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+          border stripe>
+        <el-table-column type="selection" width="55">
+        </el-table-column>
+        <el-table-column label="#" type="index"></el-table-column>
         <el-table-column label="题型" prop="quesTypeId"  width="80px">
             <template  slot-scope="scope">
                 <el-tag color="white"  size="medium">
@@ -143,7 +160,7 @@
                 </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="题目" prop="title" show-overflow-tooltip width="290px"></el-table-column>
+        <el-table-column label="题目" prop="title" show-overflow-tooltip width="345px"></el-table-column>
         <el-table-column label="分数" prop="score" width="60px" ></el-table-column>
         <el-table-column label="难度" prop="difficult" width="60px"></el-table-column>
         <el-table-column label="创建时间" sortable prop="createTime" show-overflow-tooltip ></el-table-column>
@@ -153,6 +170,11 @@
             </template>
         </el-table-column>
         </el-table>
+        <!-- 分页区域-->
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+          :current-page="queryInfo.current" :page-sizes="[1, 2, 5, 10]" :page-size="queryInfo.size"
+          layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
         <span slot="footer" class="dialog-footer">
           <el-button @click="setQuesDialogFlag = false">取 消</el-button>
           <el-button type="primary" @click="addQues()">确 定</el-button>
@@ -161,27 +183,35 @@
     </div>
   </template>
 <script>
+import questionVue from '@/views/paper/module/quesList'
 
 export default {
   name: 'Create',
   components: {
+    questionVue
   },
   data () {
     return {
+      gradeId: null,
       options: [], // 年级下拉框
       subjectOptions: [],
-      chooseClassIds: [], // 选择的班级
       classOptions: [], // 班级多选框接口返回的数据
-      gradeId: null, // 年级ID
-      subjectId: null, // 学科ID
       questList: [{}],
       total: 0,
       setQuesDialogFlag: false,
+
       isSubmit: false,
       loading: false,
       message: '',
-      queryInfo: {},
-      form: {},
+      questionId: 0,
+
+      queryInfo: { size: 5 },
+      form: {
+        subjectId: null,
+        questions: [],
+        test: []
+      },
+      multipleSelection: [],
       rules: {
         // deadline: [{
         //   required: true,
@@ -218,10 +248,10 @@ export default {
   },
   watch: {
     gradeId () {
+      this.form.subjectId = null
       // 获取学科
       this.$http.get('/subject/getSubjectByGradeId/' + this.gradeId).then(result => {
         if (result.data.code === 0) {
-          this.subjectId = null
           const res = result.data.data
           if (res == undefined || res.length <= 0) {
             this.subjectOptions = []
@@ -235,7 +265,7 @@ export default {
       })
 
       // 获取班级
-      this.chooseClassIds = []
+      this.form.chooseClassIds = []
       this.$http.get('/class/getClassByGradeId/' + this.gradeId).then(result => {
         if (result.data.code === 0) {
           const res = result.data.data
@@ -279,7 +309,7 @@ export default {
       //   }
 
       this.queryInfo.gradeId = this.gradeId
-      this.queryInfo.subjectId = this.subjectId
+      this.queryInfo.subjectId = this.form.subjectId
 
       this.$http.get('/vQuestion/getPage', {
         params: this.queryInfo
@@ -297,6 +327,45 @@ export default {
           this.$router.push('/')
         }
       })
+    },
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+    },
+    // 监听 pagesize 改变的事件
+    handleSizeChange (newSize) {
+      this.queryInfo.size = newSize// 重新指定每页数据量
+      this.getAllQues()// 带着新的分页请求获取数据
+    },
+    // 监听 页码值 改变的事件
+    handleCurrentChange (newPage) {
+      this.queryInfo.current = newPage// 重新指定当前页
+      this.getAllQues()// 带着新的分页请求获取数据
+    },
+    addQues () {
+      for (var i = 0; i < this.multipleSelection.length; i++) {
+        var ques = this.multipleSelection[i]
+        this.questionId++
+        ques.id = this.questionId
+        ques.answer = JSON.parse(ques.answer)
+        ques.content = JSON.parse(ques.content)
+        this.form.questions.push(ques)
+      }
+      console.log(this.form.questions)
+      this.setQuesDialogFlag = false
+    },
+    removeQuestion (id) { // 删除题目
+      this.questionId--
+      this.form.test.splice(0)
+      for (let i = 0; i < this.form.questions.length; i++) {
+        if (this.form.questions[i].id != id) {
+          this.form.test.push(this.form.questions[i])
+        }
+      }
+      this.form.questions.splice(0)
+      for (let i = 0; i < this.form.test.length; i++) {
+        this.form.test[i].id = i + 1
+        this.form.questions.push(this.form.test[i])
+      }
     }
   }
 }
