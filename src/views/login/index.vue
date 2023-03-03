@@ -6,13 +6,13 @@
         </div>
         <el-form-item prop="userName">
           <span slot="label">
-            <span style="color: white">用户名</span>
+            <span style="color: white;font-size:15px">用户名</span>
           </span>
           <el-input ref="userName" v-model="loginForm.userName" placeholder="用户名" name="userName" type="text" tabindex="1" auto-complete="on"/>
         </el-form-item>
         <el-form-item prop="password">
           <span slot="label">
-            <span style="color: white">密码</span>
+            <span style="color: white;font-size:15px">密码</span>
           </span>
           <el-input ref="password" v-model="loginForm.password" placeholder="密码" name="password" type="text" tabindex="1" auto-complete="on"/>
         </el-form-item>
@@ -110,9 +110,9 @@ export default {
 }
 .title-container {/*登录框的样式*/
     width: 100%;
-    line-height: 70px;
+    line-height: 50px;
     text-align: center;/*/*图像处理系统的位置*/
-    font-size: 20px;/*图像处理系统的大小*/
+    font-size: 25px;/*图像处理系统的大小*/
     color: #fff;/*图像处理系统的颜色*/
     border-bottom: 1px solid ;/*分割线的颜色*/
 }
@@ -122,8 +122,8 @@ export default {
     top: 50%;
     width: 300px;
     margin: -190px 0 0 -190px;
-    border-radius: 15px;/*角边弧度*/
-    background: rgba(6, 43, 167, 0.521);
+    border-radius: 10px;/*角边弧度*/
+    background: rgb(68 80 95);
     overflow: hidden;
 }
 .login-form {/*输入框的内边距*/
@@ -135,8 +135,8 @@ export default {
  .el-button--primary {/*登录按钮样式*/
     color: white;
     font-weight: bold;
-    background-color:rgb(148, 197, 238);
-    border-color: rgb(148, 197, 238);
+    background-color:#409eff;
+    border-color: #409eff;
     width: 50%;
     height: 50%;
     margin-bottom: 10px;

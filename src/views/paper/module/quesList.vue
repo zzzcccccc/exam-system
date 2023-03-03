@@ -2,7 +2,7 @@
     <div  class="el-form-item el-form-item--default asterisk-left"
         role="group" aria-labelledby="el-id-2022-421" style="margin-top: 20px;
         padding-bottom: 20px; border-bottom: 1px solid rgb(223, 230, 236);">
-        <div  class="el-form-item__label" style="width: 100px;">题目{{question.id}} ：</div>
+        <div  class="el-form-item__label" style="width: 100px;">题目{{question.idIndex}} ：</div>
         <div class="el-form-item__content">
             <div style="display: flex;" >
                 <div style="line-height: 1.8; flex: 1 1 0%;" >
@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     removeQuestion () {
-      this.$emit('removeQuestion', this.question.id)
+      this.$emit('removeQuestion', this.question.idIndex)
     }
   }
 }

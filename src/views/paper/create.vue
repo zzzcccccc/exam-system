@@ -116,16 +116,18 @@
             type="primary"
             :loading="loading"
             style="margin-top: 20px"
+            @click="submit"
           >
             提交试卷
           </el-button>
         </el-form>
       </div>
-      <!-- 添加题目 -->
-      <el-dialog title="添加题目" :visible.sync="setQuesDialogFlag" width="70%" >
+
+      <!-- 添加试题 -->
+      <el-dialog title="添加试题" :visible.sync="setQuesDialogFlag" width="70%" >
         <el-row>
           <el-col :span="6">
-              <el-select v-model="queryInfo.paperType"  clearable @clear="getAllQues()" placeholder="请选择题目类型">
+              <el-select v-model="queryInfo.paperType"  clearable @clear="getAllQues()" placeholder="请选择试题类型">
               <el-option
                   v-for="item in quesTypeOptions"
                   :key="item.value"
@@ -180,15 +182,29 @@
           <el-button type="primary" @click="addQues()">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 查看试题 -->
+      <el-dialog title="查看试题" :visible.sync="viewQuesDialogFlag" width="65%" >
+        <el-form>
+          <viewQuestionVue
+          :question="question"
+          class="question-content"
+          />
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="viewQuesDialogFlag = false">取 消</el-button>
+        </span>
+      </el-dialog>
     </div>
   </template>
 <script>
 import questionVue from '@/views/paper/module/quesList'
+import viewQuestionVue from '@/views/paper/module/question'
 
 export default {
   name: 'Create',
   components: {
-    questionVue
+    questionVue,
+    viewQuestionVue
   },
   data () {
     return {
@@ -199,18 +215,21 @@ export default {
       questList: [{}],
       total: 0,
       setQuesDialogFlag: false,
-
+      viewQuesDialogFlag: false,
       isSubmit: false,
       loading: false,
       message: '',
       questionId: 0,
 
-      queryInfo: { size: 5 },
+      queryInfo: {
+        quesIds: ''
+      },
       form: {
         subjectId: null,
         questions: [],
         test: []
       },
+      question: {}, // view
       multipleSelection: [],
       rules: {
         // deadline: [{
@@ -221,6 +240,11 @@ export default {
         headline: [{
           required: true,
           message: '请输入试卷标题（1-20个字）',
+          trigger: 'blur'
+        }],
+        subjectId: [{
+          required: true,
+          message: '请选择学科',
           trigger: 'blur'
         }]
       },
@@ -292,24 +316,27 @@ export default {
     },
     getAllQues () {
       this.isSubmit = true
-      //   if (this.gradeId === null) {
-      //     this.isSubmit = false
-      //     this.message = '请输入年级'
-      //   } else if (this.subjectId === null) {
-      //     this.isSubmit = false
-      //     this.message = '请输入学科'
-      //   }
-      //   if (!this.isSubmit) {
-      //     this.$notify({
-      //       title: '警告',
-      //       message: this.message,
-      //       type: 'warning'
-      //     })
-      //     return
-      //   }
-
+      if (this.gradeId === null) {
+        this.isSubmit = false
+        this.message = '请输入年级'
+      } else if (this.subjectId === null) {
+        this.isSubmit = false
+        this.message = '请输入学科'
+      }
+      if (!this.isSubmit) {
+        this.$notify({
+          title: '警告',
+          message: this.message,
+          type: 'warning'
+        })
+        return
+      }
+      this.queryInfo.quesIds = ''
       this.queryInfo.gradeId = this.gradeId
       this.queryInfo.subjectId = this.form.subjectId
+      for (var i = 0; i < this.form.questions.length; i++) {
+        this.queryInfo.quesIds += this.form.questions[i].id + ','
+      }
 
       this.$http.get('/vQuestion/getPage', {
         params: this.queryInfo
@@ -342,30 +369,67 @@ export default {
       this.getAllQues()// 带着新的分页请求获取数据
     },
     addQues () {
+      this.queryInfo.current = 1
       for (var i = 0; i < this.multipleSelection.length; i++) {
         var ques = this.multipleSelection[i]
         this.questionId++
-        ques.id = this.questionId
+        ques.idIndex = this.questionId
         ques.answer = JSON.parse(ques.answer)
         ques.content = JSON.parse(ques.content)
         this.form.questions.push(ques)
       }
-      console.log(this.form.questions)
       this.setQuesDialogFlag = false
     },
-    removeQuestion (id) { // 删除题目
+    removeQuestion (idIndex) { // 删除题目
       this.questionId--
       this.form.test.splice(0)
       for (let i = 0; i < this.form.questions.length; i++) {
-        if (this.form.questions[i].id != id) {
+        if (this.form.questions[i].idIndex != idIndex) {
           this.form.test.push(this.form.questions[i])
         }
       }
       this.form.questions.splice(0)
       for (let i = 0; i < this.form.test.length; i++) {
-        this.form.test[i].id = i + 1
+        this.form.test[i].idIndex = i + 1
         this.form.questions.push(this.form.test[i])
       }
+    },
+    view (row) {
+      this.question = JSON.parse(JSON.stringify(row))
+      this.question.answer = JSON.parse(row.answer)
+      this.question.content = JSON.parse(row.content)
+      this.viewQuesDialogFlag = true
+    },
+    submit () {
+      if (this.form.questions.length === 0) {
+        this.$notify({
+          title: '警告',
+          message: '请添加试题',
+          type: 'warning'
+        })
+        return
+      }
+      const form = JSON.parse(JSON.stringify(this.form))
+      this.loading = true
+      this.$refs.form.validate(res => {
+        if (!res) {
+          this.loading = false
+          return
+        }
+
+        form.gradeId = this.gradeId
+        form.subjectId = this.subjectId
+        form.classIds = this.chooseClassIds
+
+        this.$http.post('/paper/add',
+          form).then((res) => {
+          this.$message.success('添加成功~')
+          this.$router.push('/topic/list')
+        }).catch(() => {
+          this.form.splice(0)
+          this.loading = false
+        })
+      })
     }
   }
 }
