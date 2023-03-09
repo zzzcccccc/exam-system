@@ -56,7 +56,7 @@
         <el-table-column prop="lastExecutionTime" label="上次执行时间" show-overflow-tooltip />
         <el-table-column prop="latelyExecutionTime" label="最近执行时间"  show-overflow-tooltip index=""/>
         <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip/>
-        <el-table-column label="操作" width="120px">
+        <el-table-column label="操作" width="120px" align="center">
             <template slot-scope="scope">
                 <!-- 放置修改、删除按钮 -->
                 <el-tooltip effect="dark" content="修改" placement="top">

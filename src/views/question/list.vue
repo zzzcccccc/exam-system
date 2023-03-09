@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-parsing-error -->
 <template>
     <div>
       <!-- 面包屑导航区域 -->
@@ -63,9 +64,9 @@
         <el-table-column label="题型" prop="quesTypeId">
             <template  slot-scope="scope">
                 <el-tag color="white"  size="medium">
-                  {{ scope.row.quesTypeId  &lt; 3 ? scope.row.quesTypeId === 1 ?
+                   {{ scope.row.quesTypeId  < 3 ? scope.row.quesTypeId === 1 ?
                   '单选题' : '多选题'
-                : scope.row.quesTypeId &lt; 5 ?
+                : scope.row.quesTypeId < 5 ?
                 scope.row.quesTypeId === 3 ?
                     '填空题' : '简答题'
                   : '判断题' }}
@@ -76,9 +77,8 @@
         <el-table-column label="分数" prop="score" width="60px" ></el-table-column>
         <el-table-column label="难度" prop="difficult" width="60px"></el-table-column>
         <el-table-column label="创建时间" sortable prop="createTime" show-overflow-tooltip ></el-table-column>
-        <el-table-column label="操作" width="180px">
+        <el-table-column label="操作" width="145px" align="center" >
             <template  slot-scope="scope">
-            <el-button type="info" icon="el-icon-view" size="mini"></el-button>
             <el-button type="primary" icon="el-icon-edit" size="mini"  @click="editQues(scope.row)" ></el-button>
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row)"></el-button>
             </template>

@@ -38,11 +38,11 @@
       </el-row>
       <br/>
       <el-table  :data="list" border stripe>
-        <el-table-column type="index" label="序号"  width="55"  align="center"/>
+        <el-table-column type="index" label="序号"  width="60"  align="center"/>
         <el-table-column prop="name" label="学科名称"/>
         <el-table-column prop="gradeName" label="年级" />
-        <el-table-column prop="createTime" label="创建时间" width="160px"/>
-        <el-table-column label="操作" width="290px">
+        <el-table-column prop="createTime" label="创建时间" />
+        <el-table-column label="操作" align="center">
             <template slot-scope="scope">
                 <!-- 放置修改、删除按钮 -->
                 <el-tooltip effect="dark" content="修改" placement="top">

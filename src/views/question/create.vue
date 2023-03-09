@@ -1,5 +1,10 @@
 <template>
     <div class="app-container">
+      <el-breadcrumb separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>题库管理</el-breadcrumb-item>
+        <el-breadcrumb-item>创编</el-breadcrumb-item>
+      </el-breadcrumb>
       <div>
         <el-form
           ref="form"
@@ -21,10 +26,11 @@
             <el-form-item prop="gradeId">
               <!--  添加multiple 属性可选择多个-->
               <el-select
-                v-model="gradeId"
+                v-model="form.gradeId"
                 filterable
                 allow-create
                 default-first-option
+                @click.native="getAllGrade()"
                 placeholder="请选择年级"
               >
               <el-option
@@ -40,7 +46,7 @@
               <span class="content-label">选择科目</span>
               <el-form-item prop="subjectId">
                 <el-select
-                  v-model="subjectId"
+                  v-model="form.subjectId"
                   filterable
                   allow-create
                   default-first-option
@@ -154,12 +160,12 @@ export default {
       loading: false,
       questionId: 0,
       form: {
+        gradeId: null,
+        subjectId: null,
         check: 1,
         deadline: '', // 截止时间
         questions: []
       },
-      gradeId: null, // 年级ID
-      subjectId: null, // 学科ID
       questionType: [],
       rules: {
         subjectId: [{
@@ -176,17 +182,16 @@ export default {
     }
   },
   created () {
-    this.getAllGrade()
     this.getQuestionType()
   },
   watch: {
-    gradeId () {
+    'form.gradeId' () {
       // 获取学科
-      this.$http.get('/subject/getSubjectByGradeId/' + this.gradeId).then(result => {
+      this.$http.get('/subject/getSubjectByGradeId/' + this.form.gradeId).then(result => {
         if (result.data.code === 0) {
-          this.subjectId = null
           const res = result.data.data
           if (res == undefined || res.length <= 0) {
+            this.form.subjectId = null
             this.subjectOptions = []
           } else {
             this.subjectOptions = res
@@ -198,12 +203,12 @@ export default {
       })
 
       // 获取班级
-      this.chooseClassIds = []
-      this.$http.get('/class/getClassByGradeId/' + this.gradeId).then(result => {
+      this.$http.get('/class/getClassByGradeId/' + this.form.gradeId).then(result => {
         if (result.data.code === 0) {
+          this.chooseClassIds = []
+          this.classOptions = []
           const res = result.data.data
           if (res == undefined || res.length <= 0) {
-            this.classOptions = []
           } else {
             this.classOptions = res
           }
@@ -298,8 +303,7 @@ export default {
           question.content = JSON.stringify(question.content)
           question.difficult = JSON.stringify(question.difficult)
         })
-        form.gradeId = this.gradeId
-        form.subjectId = this.subjectId
+
         form.classIds = this.chooseClassIds
 
         this.$http.post('vQuestion/add',

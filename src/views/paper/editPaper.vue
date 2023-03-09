@@ -4,7 +4,8 @@
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>卷库管理</el-breadcrumb-item>
-        <el-breadcrumb-item>创编</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/exam/paper' }">列表</el-breadcrumb-item>
+        <el-breadcrumb-item>详情</el-breadcrumb-item>
       </el-breadcrumb>
       <div>
         <el-form
@@ -109,7 +110,7 @@
               </div>
 
             </div>
-            <div class="settings-wrap" style="width: 10%">
+            <div v-if="type=='edit'" class="settings-wrap" style="width: 10%">
                 <el-button
                 type="success"
                 class="button1"
@@ -119,12 +120,20 @@
             </div>
           </div>
           <el-button
+            v-if="type=='edit'"
             type="primary"
             :loading="loading"
             style="margin-top: 20px"
             @click="submit"
           >
             提交试卷
+          </el-button>
+          <el-button
+            type="info"
+            @click="$router.back()"
+            style="margin-top: 20px"
+          >
+            返回
           </el-button>
         </el-form>
       </div>
@@ -214,6 +223,8 @@ export default {
   },
   data () {
     return {
+      type: this.$route.query.type,
+      gradeId: null,
       options: [], // 年级下拉框
       subjectOptions: [],
       classOptions: [], // 班级多选框接口返回的数据
@@ -225,26 +236,15 @@ export default {
       loading: false,
       message: '',
       questionId: 0,
-
       queryInfo: {
         quesIds: '',
         size: 5
       },
-      form: {
-        gradeId: null,
-        subjectId: null,
-        questions: [],
-        quesIds: '',
-        test: []
-      },
+      form: {},
+      quesTests: [{}],
       question: {}, // view
       multipleSelection: [],
       rules: {
-        // deadline: [{
-        //   required: true,
-        //   message: '请选择截止时间',
-        //   trigger: 'blur'
-        // }],
         headline: [{
           required: true,
           message: '请输入试卷标题（1-20个字）',
@@ -276,17 +276,27 @@ export default {
     }
   },
   created () {
+    this.form = this.$route.query.params
+    for (let i = 0; i < this.form.questions.length; i++) {
+      this.questionId++
+      const question = this.form.questions[i]
+      if ((question.quesTypeId === 1 || question.quesTypeId === 2) && question.content.length != 0) {
+        question.content = JSON.parse(question.content)
+      }
+      question.idIndex = this.questionId
+    }
+    this.form.classIds = JSON.parse(this.$route.query.params.classIdArray)
     this.getAllGrade()
   },
   watch: {
     'form.gradeId' () {
-      this.form.subjectId = null
       // 获取学科
       this.$http.get('/subject/getSubjectByGradeId/' + this.form.gradeId).then(result => {
         if (result.data.code === 0) {
           const res = result.data.data
           if (res == undefined || res.length <= 0) {
             this.subjectOptions = []
+            this.form.subjectId = null
           } else {
             this.subjectOptions = res
           }
@@ -297,11 +307,11 @@ export default {
       })
 
       // 获取班级
-      this.form.classIds = []
       this.$http.get('/class/getClassByGradeId/' + this.form.gradeId).then(result => {
         if (result.data.code === 0) {
           const res = result.data.data
           if (res == undefined || res.length <= 0) {
+            this.form.classIds = []
             this.classOptions = []
           } else {
             this.classOptions = res
@@ -319,6 +329,34 @@ export default {
           this.$message.error(result.data.msg)
           this.$store.commit('delToken')
           this.$router.push('/')
+        }
+      })
+    },
+    getSubjectByGradeId () {
+      this.$http.get('/subject/getSubjectByGradeId/' + this.form.gradeId).then(result => {
+        if (result.data.code === 0) {
+          const res = result.data.data
+          if (res == undefined || res.length <= 0) {
+            this.form.subjectId = null
+            this.subjectOptions = []
+          } else {
+            this.subjectOptions = res
+          }
+        } else {
+          this.$store.commit('delToken')
+          this.$router.push('/')
+        }
+      })
+    },
+    getClassByGradeId () {
+      this.$http.get('/class/getClassByGradeId/' + this.form.gradeId).then(result => {
+        if (result.data.code === 0) {
+          const res = result.data.data
+          if (res == undefined || res.length <= 0) {
+            this.classOptions = []
+          } else {
+            this.classOptions = res
+          }
         }
       })
     },
@@ -340,7 +378,7 @@ export default {
         return
       }
       this.queryInfo.quesIds = ''
-      this.queryInfo.gradeId = this.form.gradeId
+      this.queryInfo.gradeId = this.gradeId
       this.queryInfo.subjectId = this.form.subjectId
       this.form.quesIds = ''
       for (var i = 0; i < this.form.questions.length; i++) {
@@ -391,16 +429,16 @@ export default {
     },
     removeQuestion (idIndex) { // 删除题目
       this.questionId--
-      this.form.test.splice(0)
+      this.quesTests.splice(0)
       for (let i = 0; i < this.form.questions.length; i++) {
         if (this.form.questions[i].idIndex != idIndex) {
-          this.form.test.push(this.form.questions[i])
+          this.quesTests.push(this.form.questions[i])
         }
       }
       this.form.questions.splice(0)
-      for (let i = 0; i < this.form.test.length; i++) {
-        this.form.test[i].idIndex = i + 1
-        this.form.questions.push(this.form.test[i])
+      for (let i = 0; i < this.quesTests.length; i++) {
+        this.quesTests[i].idIndex = i + 1
+        this.form.questions.push(this.quesTests[i])
       }
     },
     view (row) {
@@ -426,14 +464,15 @@ export default {
           return
         }
 
+        form.gradeId = this.gradeId
         for (var i = 0; i < form.questions.length; i++) {
           form.quesIds += form.questions[i].id + ','
         }
         form.questions.splice(0)
 
-        this.$http.post('/paper/add',
+        this.$http.post('/paper/edit',
           form).then((res) => {
-          this.$message.success('添加成功~')
+          this.$message.success('修改成功~')
           this.$router.push('/exam/paper')
         }).catch(() => {
           this.loading = false

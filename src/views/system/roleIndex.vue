@@ -19,7 +19,7 @@
         <el-table-column prop="role" label="角色标识"/>
         <el-table-column  prop="roleName" label="角色名称"/>
         <el-table-column prop="createTime" label="创建时间"/>
-        <el-table-column label="操作" width="280px">
+        <el-table-column label="操作" width="280px" align="center" >
             <template slot-scope="scope">
                 <!-- 放置修改、删除和分配角色按钮  -->
                 <!--  鼠标放上去会提示内容标签 <el-tooltip effect="dark" content="删除" placement="top"></el-tooltip> -->

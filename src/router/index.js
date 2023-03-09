@@ -21,6 +21,8 @@ import EditTopic from '../views/question/editQues.vue'
 
 import ListPaper from '../views/paper/list.vue'
 import CreatePaper from '../views/paper/create.vue'
+import EditPaper from '../views/paper/editPaper.vue'
+import CorrectPaper from '../views/paper/correct.vue'
 
 import store from '../store'
 import storage from '../model/storage'
@@ -172,6 +174,14 @@ const routes = [
       {
         path: '/paper/create',
         component: CreatePaper
+      },
+      {
+        path: '/paper/edit',
+        component: EditPaper
+      },
+      {
+        path: '/paper/correct',
+        component: CorrectPaper
       }
     ]
   }

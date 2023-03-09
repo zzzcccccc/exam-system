@@ -71,7 +71,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="173px">
+        <el-table-column label="操作" width="173px" align="center" >
             <template slot-scope="scope">
                 <!-- 放置修改、删除按钮 -->
                 <el-tooltip effect="dark" content="查看" placement="top">

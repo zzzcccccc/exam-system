@@ -1,5 +1,11 @@
 <template>
 <div>
+  <el-breadcrumb separator-class="el-icon-arrow-right">
+    <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+    <el-breadcrumb-item>题库管理</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{ path: '/topic/list' }">列表</el-breadcrumb-item>
+    <el-breadcrumb-item>修改</el-breadcrumb-item>
+  </el-breadcrumb>
     <el-form>
         <!-- 调用另一个vue  试题模板vue  -->
         <questionVue
@@ -72,6 +78,5 @@ export default ({
         })
     }
   }
-
 })
 </script>

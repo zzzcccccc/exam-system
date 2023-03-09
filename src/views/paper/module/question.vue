@@ -1,3 +1,4 @@
+<!-- 比question路径下的  新增了:disabled readonly的限制 用作试卷修改和查看-->
 <template>
     <el-card class="box-card">
       <div slot="header" class="clearfix" style="margin-bottom: -10px">
