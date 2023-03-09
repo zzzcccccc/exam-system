@@ -20,9 +20,11 @@ import CreateTopic from '../views/question/create.vue'
 import EditTopic from '../views/question/editQues.vue'
 
 import ListPaper from '../views/paper/list.vue'
+import ListAdminPaper from '../views/paper/listAdmin.vue'
 import CreatePaper from '../views/paper/create.vue'
 import EditPaper from '../views/paper/editPaper.vue'
 import CorrectPaper from '../views/paper/correct.vue'
+import AnswerPaper from '../views/paper/answer.vue'
 
 import store from '../store'
 import storage from '../model/storage'
@@ -169,6 +171,10 @@ const routes = [
     children: [
       {
         path: '/exam/paper',
+        component: ListAdminPaper
+      },
+      {
+        path: '/paper/list',
         component: ListPaper
       },
       {
@@ -182,6 +188,10 @@ const routes = [
       {
         path: '/paper/correct',
         component: CorrectPaper
+      },
+      {
+        path: '/paper/do',
+        component: AnswerPaper
       }
     ]
   }

@@ -5,7 +5,8 @@
         <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>卷库管理</el-breadcrumb-item>
         <el-breadcrumb-item :to="{ path: '/exam/paper' }">列表</el-breadcrumb-item>
-        <el-breadcrumb-item>详情</el-breadcrumb-item>
+        <el-breadcrumb-item v-if="type=='edit'" >编辑</el-breadcrumb-item>
+        <el-breadcrumb-item v-if="type=='view'" >查看</el-breadcrumb-item>
       </el-breadcrumb>
       <div>
         <el-form
@@ -26,6 +27,7 @@
                 allow-create
                 default-first-option
                 placeholder="请选择年级"
+                disabled
               >
               <el-option
                 v-for="item in options"
@@ -45,6 +47,7 @@
                   allow-create
                   default-first-option
                   placeholder="请选择学科"
+                  disabled
                 >
                   <el-option
                     v-for="item in subjectOptions"
@@ -66,6 +69,7 @@
                   allow-create
                   default-first-option
                   placeholder="请选择班级"
+                  disabled
                 >
                   <el-option
                     v-for="item in classOptions"
@@ -240,7 +244,7 @@ export default {
         quesIds: '',
         size: 5
       },
-      form: {},
+      form: { classIds: [] },
       quesTests: [{}],
       question: {}, // view
       multipleSelection: [],
@@ -329,34 +333,6 @@ export default {
           this.$message.error(result.data.msg)
           this.$store.commit('delToken')
           this.$router.push('/')
-        }
-      })
-    },
-    getSubjectByGradeId () {
-      this.$http.get('/subject/getSubjectByGradeId/' + this.form.gradeId).then(result => {
-        if (result.data.code === 0) {
-          const res = result.data.data
-          if (res == undefined || res.length <= 0) {
-            this.form.subjectId = null
-            this.subjectOptions = []
-          } else {
-            this.subjectOptions = res
-          }
-        } else {
-          this.$store.commit('delToken')
-          this.$router.push('/')
-        }
-      })
-    },
-    getClassByGradeId () {
-      this.$http.get('/class/getClassByGradeId/' + this.form.gradeId).then(result => {
-        if (result.data.code === 0) {
-          const res = result.data.data
-          if (res == undefined || res.length <= 0) {
-            this.classOptions = []
-          } else {
-            this.classOptions = res
-          }
         }
       })
     },

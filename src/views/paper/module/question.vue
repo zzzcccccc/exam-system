@@ -102,8 +102,6 @@
 <script>
 
 export default {
-  components: {
-  },
   props: {
     question: {
       type: Object,

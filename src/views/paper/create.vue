@@ -214,6 +214,7 @@ export default {
   },
   data () {
     return {
+      loginId: this.$cookie.get('loginId'),
       options: [], // 年级下拉框
       subjectOptions: [],
       classOptions: [], // 班级多选框接口返回的数据
@@ -430,7 +431,7 @@ export default {
           form.quesIds += form.questions[i].id + ','
         }
         form.questions.splice(0)
-
+        form.userId = this.loginId
         this.$http.post('/paper/add',
           form).then((res) => {
           this.$message.success('添加成功~')
