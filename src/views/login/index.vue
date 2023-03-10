@@ -82,6 +82,7 @@ export default {
               .then(result => {
                 if (result.data.code === 0) {
                   this.$store.commit('setRole', result.data.data)
+                  this.$cookie.set('role', result.data.data)
                 }
               })
           } else {

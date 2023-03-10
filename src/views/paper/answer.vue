@@ -47,18 +47,21 @@ export default ({
   },
   data () {
     return {
-      form: this.$route.query.params
+      form: this.$route.query.params,
+      quesIndex: 0
     }
   },
   methods: {
     // 从试卷模板vue添加题目方法
     addQuestion () {
       for (let i = 0; i < this.form.questions.length; i++) {
+        this.quesIndex++
         const question = this.form.questions[i]
         if ((question.quesTypeId === 1 || question.quesTypeId === 2) && question.content.length != 0) {
           question.content = JSON.parse(question.content)
         }
-        question.answer = []
+        question.userAnswer = []
+        question.quesIndex = this.quesIndex
       }
     },
     goBack () {
@@ -68,15 +71,17 @@ export default ({
     submit () {
       for (let i = 0; i < this.form.questions.length; i++) {
         const question = this.form.questions[i]
-        question.userAnswer = JSON.stringify(question.answer)
+        // question.content = JSON.stringify(question.content)
+        question.userAnswer = JSON.stringify(question.userAnswer)
       }
 
-      this.$http.put('paper/answer/insert', this.form)
+      this.$http.put('paper/answer/update', this.form)
+      console.log(this.form)
         .then(result => {
           if (result.data.code === 0) {
             this.$message.success(result.data.msg)
             this.$router.back()
-          } else if (result.data.code === 1 || result.data.code === 503) {
+          } else if (result.data.code === 1) {
             this.$message.error(result.data.msg)
           } else {
             this.$message.error(result.data.msg)

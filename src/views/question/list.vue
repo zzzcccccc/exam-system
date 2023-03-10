@@ -61,7 +61,7 @@
         >
         </el-table-column>
         <el-table-column label="年级" sortable prop="gradeName"></el-table-column>
-        <el-table-column label="题型" prop="quesTypeId">
+        <el-table-column label="题型" prop="quesTypeId" align="center">
             <template  slot-scope="scope">
                 <el-tag color="white"  size="medium">
                    {{ scope.row.quesTypeId  < 3 ? scope.row.quesTypeId === 1 ?
@@ -74,8 +74,8 @@
           </template>
         </el-table-column>
         <el-table-column label="题目" prop="title" show-overflow-tooltip width="320px"></el-table-column>
-        <el-table-column label="分数" prop="score" width="60px" ></el-table-column>
-        <el-table-column label="难度" prop="difficult" width="60px"></el-table-column>
+        <el-table-column label="分数" prop="score" width="60px" align="center"></el-table-column>
+        <el-table-column label="难度" prop="difficult" width="60px" align="center"></el-table-column>
         <el-table-column label="创建时间" sortable prop="createTime" show-overflow-tooltip ></el-table-column>
         <el-table-column label="操作" width="145px" align="center" >
             <template  slot-scope="scope">

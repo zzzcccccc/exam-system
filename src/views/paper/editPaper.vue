@@ -449,7 +449,7 @@ export default {
         this.$http.post('/paper/edit',
           form).then((res) => {
           this.$message.success('修改成功~')
-          this.$router.push('/exam/paper')
+          this.$router.go(-1)
         }).catch(() => {
           this.loading = false
         })

@@ -44,14 +44,39 @@
         <el-table :data="questList" tooltip-effect="dark"  border stripe>
         <el-table-column type="index"></el-table-column>
         <el-table-column label="试卷标题" prop="headline" show-overflow-tooltip></el-table-column>
-        <el-table-column label="创建人" prop="realName" show-overflow-tooltip width="150px"></el-table-column>
-        <el-table-column label="创建时间" sortable prop="createTime"  width="250px" show-overflow-tooltip ></el-table-column>
-        <el-table-column label="操作" width="320px"  align="center" >
+        <el-table-column  v-if="role.indexOf('student') > -1" label="答卷状态" align="center"  width="100px" prop="answerState" >
+          <template  slot-scope="scope">
+           <el-tag :type="(scope.row.answerState == '1' ? 'success' :  'danger')">
+                {{ scope.row.answerState == '1' ? '已完成' : '未完成'}}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="role.indexOf('student') > -1" label="批改状态" align="center" width="100px" prop="correctState"  >
+          <template  slot-scope="scope">
+           <el-tag :type="(scope.row.correctState == '1' ? 'success' :  'danger')">
+                {{ scope.row.correctState == '1' ? '已批改' : '未批改'}}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="role.indexOf('student') > -1" label="总分"  width="100px"  prop="grade" ></el-table-column>
+        <el-table-column v-if="role.indexOf('teacher') > -1" label="创建人" prop="realName" show-overflow-tooltip width="130px"></el-table-column>
+        <el-table-column label="截止时间" sortable prop="deadline" width="180px" show-overflow-tooltip ></el-table-column>
+        <el-table-column label="创建时间" sortable prop="createTime" width="180px" show-overflow-tooltip ></el-table-column>
+        <el-table-column v-if="role.indexOf('teacher') > -1"  prop="answered" label="已批改" width="100px">
+        <template slot-scope="scope">
+          <a style="color: #2a82e4; text-decoration: underline" @click="dialog(scope.row.id, 1, '已批改名单')">{{ scope.row.answered }}人</a>
+        </template>
+        </el-table-column>
+        <el-table-column  v-if="role.indexOf('teacher') > -1"  prop="uncorrected" label="未批改" width="100px">
+          <template slot-scope="scope">
+            <a style="color: #11ce66; text-decoration: underline" @click="dialog(scope.row.id, 0, '未批改名单')">{{ scope.row.uncorrected }}人</a>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="150" align="center" >
             <template  slot-scope="scope">
-            <el-button size="mini" @click="toAnswer(scope.row)" plain>答卷</el-button>
-            <el-button type="info" icon="el-icon-view" size="mini" @click="editQues(scope.row,'view')"></el-button>
-            <el-button type="primary" icon="el-icon-edit" size="mini"  @click="editQues(scope.row,'edit')" ></el-button>
-            <el-button type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row)"></el-button>
+            <el-button  v-if="role.indexOf('student') > -1"  @click="toAnswer(scope.row)" size="mini" plain>答卷</el-button>
+            <el-button  v-if="role.indexOf('teacher') > -1" type="primary" icon="el-icon-edit" size="mini"  @click="editQues(scope.row,'edit')" ></el-button>
+            <el-button  v-if="role.indexOf('teacher') > -1" type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row)"></el-button>
             </template>
         </el-table-column>
         </el-table>
@@ -67,9 +92,14 @@
 export default {
   data () {
     return {
+      userId: this.$cookie.get('loginId'),
+      role: this.$cookie.get('role'),
       total: 0,
       questList: [],
-      queryInfo: {},
+      queryInfo: {
+        userId: this.$cookie.get('loginId'),
+        role: this.$cookie.get('role')
+      },
       gradeOptions: [], // 年级下拉框
       subjectOptions: [], // 科目下拉框
       subjectName: ''
@@ -99,7 +129,7 @@ export default {
   },
   methods: {
     listAllBlog () {
-      this.$http.get('/paper/getPageAdmin', {
+      this.$http.get('/paper/getPage', {
         params: this.queryInfo
       }).then(result => {
         if (result.data.code === 0) {
@@ -114,6 +144,9 @@ export default {
           this.$router.push('/')
         }
       })
+    },
+    dialog (examId, correct, title) {
+      this.$refs.nameList.passData(examId, correct, title)
     },
     editQues (row, type) {
       this.$router.push({ path: '/paper/edit', query: { params: row, type: type } })

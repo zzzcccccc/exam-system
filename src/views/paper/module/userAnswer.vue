@@ -2,6 +2,7 @@
     <el-card class="box-card">
       <div slot="header" class="clearfix" style="margin-bottom: -5px">
         <!-- 卡片名称 -->
+        <span>第{{ question.quesIndex }}题</span>
         <span
           class="type-name"
            v-text="question.quesTypeId < 3 ?
@@ -24,7 +25,7 @@
       <!--单选、多选-->
       <el-form-item v-if="question.quesTypeId === 1 || question.quesTypeId === 2" style="margin-bottom: 0px">
         <el-checkbox-group
-          v-model="question.answer"
+          v-model="question.userAnswer"
           :min="0"
           :max="question.quesTypeId === 1 ? 1 : 4"
         >
@@ -34,7 +35,7 @@
           >
             <el-col :span="1">
               <el-checkbox-button
-                v-model="question.answer"
+                v-model="question.userAnswer"
                 :label="question.content[index]"
                 border
               >
@@ -53,7 +54,7 @@
       <!--简答、填空-->
       <el-form-item v-if="question.quesTypeId === 3 || question.quesTypeId === 4" style="margin-bottom: 0px">
         <el-input
-          v-model="question.answer[0]"
+          v-model="question.userAnswer[0]"
           type="textarea"
           placeholder="请输入参考答案"
         />
@@ -61,12 +62,12 @@
       <!--判断-->
       <el-form-item v-if="question.quesTypeId === 5" style="margin-bottom: 0px">
         <el-checkbox-group
-          v-model="question.answer"
+          v-model="question.userAnswer"
           :min="0"
           :max="1"
         >
-          <el-checkbox v-model="question.answer" label="对" border />
-          <el-checkbox v-model="question.answer" label="错" border />
+          <el-checkbox v-model="question.userAnswer" label="对" border />
+          <el-checkbox v-model="question.userAnswer" label="错" border />
         </el-checkbox-group>
       </el-form-item>
     </el-card>
@@ -97,6 +98,7 @@ export default {
   .type-name {
     color: #505050;
     font-size: 10;
+    margin-left: 20px;
     margin-right: 20px;
    }
 
