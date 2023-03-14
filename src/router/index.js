@@ -26,6 +26,8 @@ import EditPaper from '../views/paper/editPaper.vue'
 import CorrectPaper from '../views/paper/correct.vue'
 import AnswerPaper from '../views/paper/answer.vue'
 
+import Test from '../views/paper/test.vue'
+
 import store from '../store'
 import storage from '../model/storage'
 
@@ -192,6 +194,10 @@ const routes = [
       {
         path: '/paper/do',
         component: AnswerPaper
+      },
+      {
+        path: '/paper/test',
+        component: Test
       }
     ]
   }

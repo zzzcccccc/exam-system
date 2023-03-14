@@ -69,14 +69,16 @@ export default ({
       this.$router.go(-1)
     },
     submit () {
-      for (let i = 0; i < this.form.questions.length; i++) {
-        const question = this.form.questions[i]
-        // question.content = JSON.stringify(question.content)
+      const form = JSON.parse(JSON.stringify(this.form))
+      for (let i = 0; i < form.questions.length; i++) {
+        const question = form.questions[i]
+        if ((question.quesTypeId === 1 || question.quesTypeId === 2) && question.content.length != 0) {
+          question.content = JSON.stringify(question.content)
+        }
         question.userAnswer = JSON.stringify(question.userAnswer)
       }
-
-      this.$http.put('paper/answer/update', this.form)
-      console.log(this.form)
+      console.log(form)
+      this.$http.put('/paper/answer/update', form)
         .then(result => {
           if (result.data.code === 0) {
             this.$message.success(result.data.msg)

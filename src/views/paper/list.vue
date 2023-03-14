@@ -44,14 +44,14 @@
         <el-table :data="questList" tooltip-effect="dark"  border stripe>
         <el-table-column type="index"></el-table-column>
         <el-table-column label="试卷标题" prop="headline" show-overflow-tooltip></el-table-column>
-        <el-table-column  v-if="role.indexOf('student') > -1" label="答卷状态" align="center"  width="100px" prop="answerState" >
+        <el-table-column  v-if="role.indexOf('student') > -1" label="答卷状态"   width="100px" prop="answerState" >
           <template  slot-scope="scope">
            <el-tag :type="(scope.row.answerState == '1' ? 'success' :  'danger')">
                 {{ scope.row.answerState == '1' ? '已完成' : '未完成'}}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column v-if="role.indexOf('student') > -1" label="批改状态" align="center" width="100px" prop="correctState"  >
+        <el-table-column  v-if="role.indexOf('student') > -1" label="批改状态" width="100px" prop="correctState"  >
           <template  slot-scope="scope">
            <el-tag :type="(scope.row.correctState == '1' ? 'success' :  'danger')">
                 {{ scope.row.correctState == '1' ? '已批改' : '未批改'}}
@@ -62,19 +62,25 @@
         <el-table-column v-if="role.indexOf('teacher') > -1" label="创建人" prop="realName" show-overflow-tooltip width="130px"></el-table-column>
         <el-table-column label="截止时间" sortable prop="deadline" width="180px" show-overflow-tooltip ></el-table-column>
         <el-table-column label="创建时间" sortable prop="createTime" width="180px" show-overflow-tooltip ></el-table-column>
+        <el-table-column  v-if="role.indexOf('teacher') > -1" prop="noAnswered" label="未提交" width="100px">
+        <template slot-scope="scope">
+          <a style="color: #d43030; cursor: pointer; text-decoration: underline" @click="dialog(scope.row.id, 2, '未提交名单')">{{ scope.row.noAnswered }}人</a>
+        </template>
+        </el-table-column>
         <el-table-column v-if="role.indexOf('teacher') > -1"  prop="answered" label="已批改" width="100px">
         <template slot-scope="scope">
-          <a style="color: #2a82e4; text-decoration: underline" @click="dialog(scope.row.id, 1, '已批改名单')">{{ scope.row.answered }}人</a>
+          <a style="color: #2a82e4; cursor: pointer; text-decoration: underline" @click="dialog(scope.row.id, 1, '已批改名单')">{{ scope.row.answered }}人</a>
         </template>
         </el-table-column>
         <el-table-column  v-if="role.indexOf('teacher') > -1"  prop="uncorrected" label="未批改" width="100px">
           <template slot-scope="scope">
-            <a style="color: #11ce66; text-decoration: underline" @click="dialog(scope.row.id, 0, '未批改名单')">{{ scope.row.uncorrected }}人</a>
+            <a style="color: #11ce66;  cursor: pointer; text-decoration: underline" @click="dialog(scope.row.id, 0, '未批改名单')">{{ scope.row.uncorrected }}人</a>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150" align="center" >
             <template  slot-scope="scope">
-            <el-button  v-if="role.indexOf('student') > -1"  @click="toAnswer(scope.row)" size="mini" plain>答卷</el-button>
+            <el-button  v-if="role.indexOf('student') > -1 && scope.row.answerState == '0'"  @click="toAnswer(scope.row)" size="mini" plain>答卷</el-button>
+            <el-button  v-if="role.indexOf('student') > -1 && scope.row.answerState == '1'"  @click="toCorrect(scope.row)" size="mini" plain>详情</el-button>
             <el-button  v-if="role.indexOf('teacher') > -1" type="primary" icon="el-icon-edit" size="mini"  @click="editQues(scope.row,'edit')" ></el-button>
             <el-button  v-if="role.indexOf('teacher') > -1" type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row)"></el-button>
             </template>
@@ -85,11 +91,18 @@
         :current-page="queryInfo.current" :page-sizes="[1, 2, 5, 10]" :page-size="queryInfo.size"
         layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
+       <!--名单弹窗-->
+    <nameList ref="nameList" />
     </div>
   </template>
 
 <script>
+import nameList from '@/views/paper/module/nameList'
+
 export default {
+  components: {
+    nameList
+  },
   data () {
     return {
       userId: this.$cookie.get('loginId'),
@@ -145,14 +158,24 @@ export default {
         }
       })
     },
-    dialog (examId, correct, title) {
-      this.$refs.nameList.passData(examId, correct, title)
+    dialog (paperId, correct, title) {
+      this.$refs.nameList.passData(paperId, correct, title, this.userId)
     },
     editQues (row, type) {
       this.$router.push({ path: '/paper/edit', query: { params: row, type: type } })
     },
     toAnswer (row) {
       this.$router.push({ path: '/paper/do', query: { params: row } })
+    },
+    toCorrect (row) {
+      this.$router.push({
+        path: '/paper/correct',
+        query: {
+          paperId: row.id,
+          userId: this.userId,
+          type: 'view'
+        }
+      })
     },
     del (row) {
       // 弹框询问用户是否删除数据
