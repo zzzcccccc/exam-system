@@ -71,16 +71,24 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="173px" align="center" >
+        <el-table-column  v-if="role.indexOf('student') > -1"  label="操作"  align="center" >
             <template slot-scope="scope">
                 <!-- 放置修改、删除按钮 -->
                 <el-tooltip effect="dark" content="查看" placement="top">
-                    <el-button  type="info" icon="el-icon-view" size="mini" @click="showInfo(scope.row)"></el-button>
+                    <el-button type="info" icon="el-icon-view" size="mini" @click="showInfo(scope.row)"></el-button>
+                </el-tooltip>
+            </template>
+        </el-table-column>
+        <el-table-column  v-else  label="操作" width="173px" align="center" >
+            <template slot-scope="scope">
+                <!-- 放置修改、删除按钮 -->
+                <el-tooltip effect="dark" content="查看" placement="top">
+                    <el-button type="info" icon="el-icon-view" size="mini" @click="showInfo(scope.row)"></el-button>
                 </el-tooltip>
                 <el-tooltip effect="dark" content="修改" placement="top">
                     <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row)"></el-button>
                 </el-tooltip>
-                 <el-tooltip effect="dark" content="删除" placement="top">
+                 <el-tooltip  effect="dark" content="删除" placement="top">
                   <el-button type="danger" icon="el-icon-delete" size="mini" @click="delUser(scope.row)"></el-button>
                 </el-tooltip>
             </template>
@@ -101,7 +109,7 @@
             <el-input v-model="cateForm.subjectName" style="width: 100%;outline: none;height: 100%" disabled></el-input>
         </el-form-item>
         <el-form-item label="班级：" >
-          <el-checkbox-group v-model="classIds">
+          <el-checkbox-group v-model="cateForm.classIds">
             <el-checkbox v-for="item in classOptions"  :label="item.id" style="width: 100%;outline: none;height: 100%" disabled
             :key="item.id" name="type">{{ item.name }}</el-checkbox>
           </el-checkbox-group>
@@ -126,6 +134,7 @@ export default {
     return {
       tokenFail: this.$store.state.tokenFail,
       permission: this.$store.getters.getPermission,
+      role: this.$cookie.get('role'),
       queryInfo: {
         current: 1,
         size: 10,
@@ -215,7 +224,6 @@ export default {
     showInfo (row) {
       this.cateForm = row
       this.userId = row.id
-      this.classIds = row.classIdArray
       this.$http.get('/system/getAllRole')
         .then(result => {
           if (result.data.code === 0) {

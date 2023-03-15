@@ -32,7 +32,7 @@
         <el-input v-model="form.phone"></el-input>
       </el-form-item>
       <el-form-item label="年级：">
-        <el-select v-model="gradeId" filterable placeholder="请选择年级">
+        <el-select  :disabled="!gradeIdFlag" v-model="form.gradeId" filterable placeholder="请选择年级">
           <el-option
           v-for="item in options"
           :key="item.id"
@@ -41,8 +41,8 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item v-if="role.indexOf('teacher') > -1" label="学科：">
-        <el-select v-model="form.subjectId" filterable placeholder="请选择学科">
+      <el-form-item label="学科：">
+        <el-select :disabled="!subjectIdFlag" v-model="form.subjectId" filterable placeholder="请选择学科">
           <el-option
           v-for="item in subjectOptions"
           :key="item.id"
@@ -53,13 +53,13 @@
       </el-form-item>
       <el-form-item  label="班级：">
         <!-- :label是传回的值  -->
-        <el-checkbox-group v-model="chooseClassIds" >
+        <el-checkbox-group  :disabled="!classIdsFlag" v-model="form.classIds" >
           <el-checkbox v-for="item in classOptions"  @change="val => handleChecked(val,item.id)" :label="item.id"
           :key="item.id" name="type">{{ item.name }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="角色：" prop="roleIds" >
-        <el-checkbox-group v-model="chooseRoleIds">
+        <el-checkbox-group v-model="form.roleIds">
           <el-checkbox v-for="item in roleOptions"  @change="val => handleCheckedRole(val,item.id)" :label="item.id"
           :key="item.id" name="type">{{ item.roleName }}</el-checkbox>
         </el-checkbox-group>
@@ -82,7 +82,6 @@ export default {
   data () {
     return {
       tokenFail: this.$store.state.tokenFail,
-      role: this.$store.getters.getRole,
       form: {
         id: null,
         userName: '',
@@ -99,15 +98,12 @@ export default {
         roleIds: []
       },
       options: [], // 年级下拉框
-      gradeId: null, // 年级id
       subjectOptions: [], // 学科下拉框
       classOptions: [], // 班级多选框数据
       roleOptions: [], // 角色多选框数据
-      // 当前操作后选中的
-      classIds: [],
-      roleIds: [],
-      chooseClassIds: [],
-      chooseRoleIds: [],
+      gradeIdFlag: true,
+      subjectIdFlag: true,
+      classIdsFlag: true,
       rules: {
         userName: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
@@ -124,6 +120,9 @@ export default {
         ],
         status: [
           { required: true, message: '请选择状态', trigger: 'blur' }
+        ],
+        roleIds: [
+          { required: true, message: '请选择角色', trigger: 'blur' }
         ]
       },
       sexEnum: [
@@ -147,31 +146,42 @@ export default {
     }
   },
   watch: {
-    gradeId () {
-      // 获取学科
-      this.$http.get('/subject/getSubjectByGradeId/' + this.gradeId).then(result => {
-        if (result.data.code === 0) {
-          this.form.subjectId = null
-          const res = result.data.data
-          if (res == undefined || res.length <= 0) {
-            this.subjectOptions = []
-          } else {
-            this.subjectOptions = res
+    'form.gradeId' () {
+      if (this.form.gradeId != null && this.form.gradeId != '') {
+        // 获取学科
+        this.$http.get('/subject/getSubjectByGradeId/' + this.form.gradeId).then(result => {
+          if (result.data.code === 0) {
+            this.change_number++
+            if (this.change_number > 1) {
+              this.form.subjectId = null
+            }
+            const res = result.data.data
+            if (res == undefined || res.length <= 0) {
+              this.subjectOptions = []
+            } else {
+              this.subjectOptions = res
+            }
           }
-        }
-      })
-      // 获取班级
-      this.$http.get('/class/getClassByGradeId/' + this.gradeId).then(result => {
-        if (result.data.code === 0) {
-          this.form.classIds = []
-          const res = result.data.data
-          if (res == undefined || res.length <= 0) {
-            this.classOptions = []
-          } else {
-            this.classOptions = res
+        })
+        // 获取班级
+        this.$http.get('/class/getClassByGradeId/' + this.form.gradeId).then(result => {
+          if (result.data.code === 0) {
+            this.change_number_class++
+            if (this.change_number_class > 1) {
+              this.form.classIds = []
+            }
+            const res = result.data.data
+            if (res == undefined || res.length <= 0) {
+              this.classOptions = []
+            } else {
+              this.classOptions = res
+            }
           }
-        }
-      })
+        })
+      } else {
+        this.subjectOptions = []
+        this.classOptions = []
+      }
     }
   },
   created () {
@@ -180,30 +190,63 @@ export default {
   },
   methods: {
     submitForm () {
-      this.isSubmit = true
-      if (this.chooseRoleIds === null || this.chooseRoleIds == '') {
-        this.isSubmit = false
-        this.message = '请选择角色！'
+      // 学生
+      if (this.form.roleIds.length > 1) {
+        if (this.form.roleIds.indexOf(1) > -1) {
+          this.$notify({
+            title: '警告',
+            message: '学生和其他角色不能同时存在',
+            type: 'warning'
+          })
+          return
+        }
       }
-      if (!this.isSubmit) {
-        this.$notify({
-          title: '警告',
-          message: this.message,
-          type: 'warning'
-        })
-        return
+      if (this.form.roleIds.indexOf(1) > -1) {
+        if (this.form.classIds.length == 0) {
+          this.$notify({
+            title: '警告',
+            message: '请选择班级',
+            type: 'warning'
+          })
+          return
+        } else if (this.form.classIds.length > 1) {
+          this.$notify({
+            title: '警告',
+            message: '学生只能加入一个班级',
+            type: 'warning'
+          })
+          return
+        }
       }
 
+      // 老师
+      if (this.form.roleIds.indexOf(2) > -1) {
+        if (this.form.classIds.length == 0) {
+          this.$notify({
+            title: '警告',
+            message: '请选择班级',
+            type: 'warning'
+          })
+          return
+        }
+        if (this.form.subjectId == null) {
+          this.$notify({
+            title: '警告',
+            message: '请选择学科',
+            type: 'warning'
+          })
+          return
+        }
+      }
       this.$refs.form.validate((valid) => { // 开启校验
         if (valid) {
-          this.form.gradeId = this.gradeId
-          this.form.classIds = this.classIds
-          this.form.roleIds = this.roleIds
           this.$http.post('user/addUser', this.form)
             .then(result => {
               if (result.data.code === 0) {
                 this.$message.success(result.data.msg)
                 this.$router.back()
+              } else if (result.data.code === 1 || result.data.code === 503) {
+                this.$message.error(result.data.msg)
               } else if (result.data.code === this.tokenFail) {
                 this.$message.error(result.data.msg)
                 this.$store.commit('delToken')
@@ -240,31 +283,62 @@ export default {
     },
     handleChecked (val, item) {
       if (val) {
-        this.classIds.push(item)
+        var index = this.form.classIds.indexOf(item)
+        if (index == -1) {
+          this.form.classIds.push(item)
+        }
       } else {
-        this.deleteItem(item, this.classIds)
+        this.deleteItem(item, this.form.classIds)
       }
     },
     deleteItem (item, listClassIds) {
       var index = listClassIds.indexOf(item)
       if (index > -1) { // 大于0 代表存在，
         listClassIds.splice(index, 1)// 存在就删除
-        this.classIds = listClassIds
+        this.form.classIds = listClassIds
       }
     },
     // 角色
     handleCheckedRole (val, item) {
       if (val) {
-        this.roleIds.push(item)
+        var index = this.form.roleIds.indexOf(item)
+        if (index == -1) {
+          this.form.roleIds.push(item)
+        }
       } else {
-        this.deleteItemRole(item, this.roleIds)
+        this.deleteItemRole(item, this.form.roleIds)
+      }
+      // 管理员
+      console.log(this.form.roleIds)
+      if (this.form.roleIds.length == 1) {
+        if (this.form.roleIds.indexOf(1) > -1) {
+          this.form.gradeId = null
+          this.form.subjectId = null
+          this.form.classIds = []
+          this.gradeIdFlag = true
+          this.subjectIdFlag = false
+          this.classIdsFlag = true
+        }
+        if (this.form.roleIds.indexOf(3) > -1) {
+          this.form.gradeId = null
+          this.form.subjectId = null
+          this.form.classIds = []
+          this.gradeIdFlag = false
+          this.subjectIdFlag = false
+          this.classIdsFlag = false
+        }
+      }
+      if (this.form.roleIds.indexOf(2) > -1) {
+        this.gradeIdFlag = true
+        this.subjectIdFlag = true
+        this.classIdsFlag = true
       }
     },
     deleteItemRole (item, listRoles) {
       var index = listRoles.indexOf(item)
       if (index > -1) { // 大于0 代表存在，
         listRoles.splice(index, 1)// 存在就删除
-        this.roleIds = listRoles
+        this.form.roleIds = listRoles
       }
     },
     restForm () {

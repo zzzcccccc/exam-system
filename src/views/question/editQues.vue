@@ -68,7 +68,7 @@ export default ({
           if (result.data.code === 0) {
             this.$message.success(result.data.msg)
             this.$router.back()
-          } else if (result.data.code === 1) {
+          } else if (result.data.code === 1 || result.data.code === 503) {
             this.$message.error(result.data.msg)
           } else {
             this.$message.error(result.data.msg)

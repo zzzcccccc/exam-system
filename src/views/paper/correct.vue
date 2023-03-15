@@ -170,7 +170,14 @@ export default {
         })
         this.form.scoreList = this.questions
         this.$http.put('/paper/answer/correct', this.form)
-          .then(() => {
+          .then((res) => {
+            if (res.data.code === 503) {
+              this.$message.error(res.data.msg)
+            } else {
+              this.$message.error(res.data.msg)
+              this.$store.commit('delToken')
+              this.$router.push('/')
+            }
             this.userIndex++
             if (this.userIndex < this.userList.length) {
               this.queryId.userId = this.userList[this.userIndex]
@@ -184,7 +191,7 @@ export default {
               //   this.getExam()
               // })
               // this.queryId.userId = res.data[0].userId
-              //   this.getExam()
+              this.getExam()
             }
 
             this.queryId.userId = this.userList[--this.userIndex]
@@ -215,11 +222,13 @@ export default {
     },
     isAnswer (content, answers) {
       let b = false
-      answers.forEach(function (answer) {
-        if (answer === content) {
-          b = true
-        }
-      })
+      if (answers != null && answers.length > 0) {
+        answers.forEach(function (answer) {
+          if (answer === content) {
+            b = true
+          }
+        })
+      }
       return b
     }
   }

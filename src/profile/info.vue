@@ -8,7 +8,7 @@
         <el-input v-model="form.password"></el-input>
       </el-form-item>
       <el-form-item label="真实姓名：" prop="realName">
-        <el-input v-model="form.realName"></el-input>
+        <el-input disabled v-model="form.realName"></el-input>
       </el-form-item>
       <el-form-item label="年龄：">
         <el-input v-model="form.age"></el-input>
@@ -25,7 +25,7 @@
         <el-input v-model="form.phone"></el-input>
       </el-form-item>
       <el-form-item label="状态：" prop="status" >
-        <el-select v-model="form.status" placeholder="状态">
+        <el-select disabled v-model="form.status" placeholder="状态">
           <el-option v-for="item in statusEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
         </el-select>
       </el-form-item>
@@ -41,7 +41,7 @@
 export default ({
   data () {
     return {
-      username: this.$cookie.get('userName'),
+      loginId: this.$cookie.get('loginId'),
       form: {
         id: null,
         userName: '',
@@ -93,7 +93,7 @@ export default ({
     }
   },
   created () {
-    this.$http.get('user/getInfoByUsername/' + this.username)
+    this.$http.get('user/getInfoById/' + this.loginId)
       .then(result => {
         if (result.data.code === 0) {
           this.form = result.data.data
