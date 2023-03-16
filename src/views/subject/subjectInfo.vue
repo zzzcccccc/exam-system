@@ -39,9 +39,9 @@
       <br/>
       <el-table  :data="list" border stripe>
         <el-table-column type="index" label="序号"  width="60"  align="center"/>
-        <el-table-column prop="name" label="学科名称"/>
-        <el-table-column prop="gradeName" label="年级" />
-        <el-table-column prop="createTime" label="创建时间" />
+        <el-table-column prop="name" label="学科名称" align="center"/>
+        <el-table-column prop="gradeName" label="年级"  align="center"/>
+        <el-table-column prop="createTime" label="创建时间" align="center" />
         <el-table-column label="操作" align="center">
             <template slot-scope="scope">
                 <!-- 放置修改、删除按钮 -->

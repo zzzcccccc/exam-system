@@ -13,18 +13,10 @@
         <!-- 分栏一共占24格，给搜索框7格，添加按钮4格 -->
         <el-col :span="4">
           <!-- 搜索与添加区域 clearable清空输入框-->
-          <el-input placeholder="请输入学科名称"  v-model="queryInfo.name" clearable @clear="getPageSubject()">
-          </el-input>
+          <el-input placeholder="请选择标题"  v-model="queryInfo.name" clearable @clear="getPageSubject()"/>
         </el-col>
         <el-col :span="4">
-            <el-select v-model="queryInfo.gradeId" filterable placeholder="请选择年级"  clearable @clear="getPageSubject()">
-                <el-option
-                v-for="item in options"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-                </el-option>
-            </el-select>
+          <el-input placeholder="请输入描述"  v-model="queryInfo.desc" clearable @clear="getPageSubject()" />
         </el-col>
         <el-col :span="2">
           <el-button type="primary" icon="el-icon-search" @click="getPageSubject()">搜索</el-button>
@@ -60,7 +52,7 @@
             <template slot-scope="scope">
                 <!-- 放置修改、删除按钮 -->
                 <el-tooltip effect="dark" content="修改" placement="top">
-                    <el-button type="primary" icon="el-icon-edit" size="mini" @click="editShow(scope.row)"></el-button>
+                    <el-button type="primary" icon="el-icon-edit" size="mini" ></el-button>
                 </el-tooltip>
                  <el-tooltip effect="dark" content="删除" placement="top">
                   <el-button type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row)"></el-button>
@@ -102,16 +94,6 @@
       <el-form :model="subjectInfo" ref="subjectInfo"  :rules="rules"  label-width="100px" >
         <el-form-item label="学科名称:" prop="name">
           <el-input v-model="subjectInfo.name" ></el-input>
-        </el-form-item>
-        <el-form-item label="年级:" prop="gradeId">
-          <el-select v-model="subjectInfo.gradeId" filterable placeholder="请选择年级">
-                <el-option
-                v-for="item in options"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-                </el-option>
-            </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -209,63 +191,51 @@ export default {
       this.editDialogVisible = true
     },
     add (subjectInfo) {
-      this.$refs.subjectInfo.validate((valid) => { // 开启校验
-        if (valid) { // 如果校验通过，请求接口，允许提交表单
-          this.$http.post('cron/add', subjectInfo)
-            .then(result => {
-              if (result.data.code === 0) {
-                this.$message.success(result.data.msg)
-                this.getPageSubject()
-                this.addDialogVisible = false
-              } else if (result.data.code === this.tokenFail) {
-                this.$message.error(result.data.msg)
-                this.$store.commit('delToken')
-                this.$router.push('/')
-              } else {
-                this.$message.error(result.data.msg)
-              }
-            })
-        } else { // 校验不通过
-          return false
-        }
-      })
+      // this.$refs.subjectInfo.validate((valid) => { // 开启校验
+      //   if (valid) { // 如果校验通过，请求接口，允许提交表单
+      //     this.$http.post('cron/add', subjectInfo)
+      //       .then(result => {
+      //         if (result.data.code === 0) {
+      //           this.$message.success(result.data.msg)
+      //           this.getPageSubject()
+      //           this.addDialogVisible = false
+      //         } else if (result.data.code === this.tokenFail) {
+      //           this.$message.error(result.data.msg)
+      //           this.$store.commit('delToken')
+      //           this.$router.push('/')
+      //         } else {
+      //           this.$message.error(result.data.msg)
+      //         }
+      //       })
+      //   } else { // 校验不通过
+      //     return false
+      //   }
+      // })
+      this.$message.error('还没写！！')
       this.addDialogVisible = false
     },
-    handleChecked (val, item) {
-      if (val) {
-        this.roles.push(item)
-      } else {
-        this.deleteItem(item, this.roles)
-      }
-    },
-    deleteItem (item, listRoles) {
-      var index = listRoles.indexOf(item)
-      if (index > -1) { // 大于0 代表存在，
-        listRoles.splice(index, 1)// 存在就删除
-        this.roles = listRoles
-      }
-    },
     edit (subjectInfo) {
-      this.$refs.subjectInfo.validate((valid) => { // 开启校验
-        if (valid) { // 如果校验通过，请求接口，允许提交表单
-          this.$http.put('subject/edit', subjectInfo)
-            .then(result => {
-              if (result.data.code === 0) {
-                this.$message.success(result.data.msg)
-                this.getPageSubject()
-                this.editDialogVisible = false
-              } else if (result.data.code === this.tokenFail) {
-                this.$message.error(result.data.msg)
-                this.$store.commit('delToken')
-                this.$router.push('/')
-              } else {
-                this.$message.error(result.data.msg)
-              }
-            })
-        } else { // 校验不通过
-          return false
-        }
-      })
+      this.$message.error('还没写！！')
+      // this.$refs.subjectInfo.validate((valid) => { // 开启校验
+      //   if (valid) { // 如果校验通过，请求接口，允许提交表单
+      //     this.$http.put('subject/edit', subjectInfo)
+      //       .then(result => {
+      //         if (result.data.code === 0) {
+      //           this.$message.success(result.data.msg)
+      //           this.getPageSubject()
+      //           this.editDialogVisible = false
+      //         } else if (result.data.code === this.tokenFail) {
+      //           this.$message.error(result.data.msg)
+      //           this.$store.commit('delToken')
+      //           this.$router.push('/')
+      //         } else {
+      //           this.$message.error(result.data.msg)
+      //         }
+      //       })
+      //   } else { // 校验不通过
+      //     return false
+      //   }
+      // })
       this.editDialogVisible = false
     },
     del (row) {
@@ -275,20 +245,21 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http.delete('/subject/del/' + row.id)
-          .then(result => {
-            if (result.data.code === 0) {
-              this.$message.success(result.data.msg)
-              // 重新获取用户列表数据
-              this.getPageSubject()
-            } else if (result.data.code === this.tokenFail) {
-              this.$message.error(result.data.msg)
-              this.$store.commit('delToken')
-              this.$router.push('/')
-            } else {
-              this.$message.error(result.data.msg)
-            }
-          })
+        this.$message.error('还没写！！')
+        // this.$http.delete('/subject/del/' + row.id)
+        //   .then(result => {
+        //     if (result.data.code === 0) {
+        //       this.$message.success(result.data.msg)
+        //       // 重新获取用户列表数据
+        //       this.getPageSubject()
+        //     } else if (result.data.code === this.tokenFail) {
+        //       this.$message.error(result.data.msg)
+        //       this.$store.commit('delToken')
+        //       this.$router.push('/')
+        //     } else {
+        //       this.$message.error(result.data.msg)
+        //     }
+        //   })
       }).catch(() => {
         this.$message({ type: 'info', message: '已取消删除' })
       })

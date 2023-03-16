@@ -171,8 +171,10 @@ export default {
         this.form.scoreList = this.questions
         this.$http.put('/paper/answer/correct', this.form)
           .then((res) => {
-            if (res.data.code === 503) {
+            if (res.data.code === 1 || res.data.code === 503) {
               this.$message.error(res.data.msg)
+            } else if (res.data.code === 0) {
+              this.getExam()
             } else {
               this.$message.error(res.data.msg)
               this.$store.commit('delToken')

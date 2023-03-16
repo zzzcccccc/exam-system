@@ -17,7 +17,7 @@
           <el-input ref="password" v-model="loginForm.password" placeholder="密码" name="password" type="text" tabindex="1" auto-complete="on"/>
         </el-form-item>
         <el-form-item class="login_btn">
-            <el-button type="primary" @click="submitForm('loginForm')">登录</el-button>
+            <el-button type="primary"  @keyup.enter="keyDown" @click="submitForm('loginForm')">登录</el-button>
             <el-button type="goon" @click="resetLoginForm('loginForm')">重置</el-button>
         </el-form-item>
     </el-form>
@@ -47,14 +47,18 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted () {
+    // 监听
     if (this.loginForm.userName === '') {
       this.$refs.userName.focus()
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus()
     }
+    window.addEventListener('keydown', this.keyDown) // 回车登录操作
   },
   destroyed () {
+    // 销毁事件
     // window.removeEventListener('storage', this.afterQRScan)
+    window.removeEventListener('keydown', this.keyDown, false)
   },
   methods: {
     submitForm () {
@@ -92,6 +96,13 @@ export default {
         // console.log(res)
         })
     },
+    keyDown (e) {
+      // 如果是回车则执行登录方法
+      if (e.keyCode == 13) {
+        // 需要执行的登录方法
+        this.submitForm()
+      }
+    },
     // 点击重置按钮 重置表单
     resetLoginForm () {
       this.$refs.loginForm.resetFields()
@@ -105,7 +116,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background-image: url(../../assets/img/login.png);
+    background-image: url(../../assets/img/20230316092256.jpg);
     background-size: 100%;
     opacity:0.8;/*透明度*/
 }
@@ -124,8 +135,12 @@ export default {
     width: 300px;
     margin: -190px 0 0 -190px;
     border-radius: 10px;/*角边弧度*/
-    background: rgb(68 80 95);
-    overflow: hidden;
+    background: rgb(79, 97, 119);
+    /* 为其整体设置接近透明的效果*/
+    background-color: rgba(255,255,255,0.1);
+    /* 设置box-shadow使其有立体感 */
+    box-shadow: 5px 5px 0 0  rgba(0,0,0,0.2);
+    overflow: hidden
 }
 .login-form {/*输入框的内边距*/
     padding: 30px 30px;

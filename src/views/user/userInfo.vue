@@ -51,7 +51,7 @@
           <el-button  type="primary" icon="el-icon-search" @click="listAllBlog()" >搜索</el-button>
         </el-col>
         <el-col :span="4">
-          <el-button   icon="el-icon-plus" type="success" @click="addUser()" >新增</el-button>
+          <el-button v-if="permission.indexOf('user:add') > -1"  icon="el-icon-plus" type="success" @click="addUser()" >新增</el-button>
         </el-col>
       </el-row>
       <br/>
@@ -60,35 +60,26 @@
         <el-table-column type="index"  align="center"/>
         <el-table-column prop="userName" label="用户名"/>
         <el-table-column prop="realName" label="真实姓名" />
-        <el-table-column prop="sex" label="性别" width="70px" :formatter="sexFormatter" />
+        <el-table-column prop="sex" label="性别" width="75px" align="center" :formatter="sexFormatter" />
         <el-table-column prop="phone" label="手机号"/>
-        <el-table-column prop="gradeName" label="年级"/>
         <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip />
-        <el-table-column label="状态"  width="70px" prop="status">
+        <el-table-column label="状态"   align="center" width="75px" prop="status">
           <template  slot-scope="scope">
            <el-tag :type="(scope.row.status == '1' ? 'success' :  'danger')">
                 {{ scope.row.status == '1' ? '启用' : '禁用'}}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column  v-if="role.indexOf('student') > -1"  label="操作"  align="center" >
+        <el-table-column  label="操作" width="173px" align="center" >
             <template slot-scope="scope">
                 <!-- 放置修改、删除按钮 -->
                 <el-tooltip effect="dark" content="查看" placement="top">
                     <el-button type="info" icon="el-icon-view" size="mini" @click="showInfo(scope.row)"></el-button>
                 </el-tooltip>
-            </template>
-        </el-table-column>
-        <el-table-column  v-else  label="操作" width="173px" align="center" >
-            <template slot-scope="scope">
-                <!-- 放置修改、删除按钮 -->
-                <el-tooltip effect="dark" content="查看" placement="top">
-                    <el-button type="info" icon="el-icon-view" size="mini" @click="showInfo(scope.row)"></el-button>
-                </el-tooltip>
-                <el-tooltip effect="dark" content="修改" placement="top">
+                <el-tooltip  v-if="permission.indexOf('user:edit') > -1" effect="dark" content="修改" placement="top">
                     <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row)"></el-button>
                 </el-tooltip>
-                 <el-tooltip  effect="dark" content="删除" placement="top">
+                 <el-tooltip  v-if="permission.indexOf('user:del') > -1" effect="dark" content="删除" placement="top">
                   <el-button type="danger" icon="el-icon-delete" size="mini" @click="delUser(scope.row)"></el-button>
                 </el-tooltip>
             </template>
@@ -134,7 +125,6 @@ export default {
     return {
       tokenFail: this.$store.state.tokenFail,
       permission: this.$store.getters.getPermission,
-      role: this.$cookie.get('role'),
       queryInfo: {
         current: 1,
         size: 10,
