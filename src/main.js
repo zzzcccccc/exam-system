@@ -21,9 +21,12 @@ Vue.prototype.$http = axios
 axios.defaults.timeout = 5000 // 单位是毫秒
 // 允许携带cookie
 axios.defaults.withCredentials = true
+// 前端处理跨域403问题,配置vue.confg.js
 axios.defaults.baseURL = '/api'
-axios.defaults.headers.post['Content-Type'] = 'application/json'
+// 后端做跨域处理时（CorsConfig方法），将vue.confg.js中devServer代码注释
+// axios.defaults.baseURL = 'http://127.0.0.1:8081'
 
+axios.defaults.headers.post['Content-Type'] = 'application/json'
 // 添加请求拦截器，若token存在则在请求头中加token，不存在也继续请求
 axios.interceptors.request.use(
   config => {
