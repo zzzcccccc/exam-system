@@ -4,9 +4,6 @@
       <el-form-item label="用户名："  prop="userName">
         <el-input v-model="form.userName"></el-input>
       </el-form-item>
-      <el-form-item label="密码：" prop="password">
-        <el-input v-model="form.password"></el-input>
-      </el-form-item>
       <el-form-item label="真实姓名：" prop="realName">
         <el-input disabled v-model="form.realName"></el-input>
       </el-form-item>
@@ -45,7 +42,6 @@ export default ({
       form: {
         id: null,
         userName: '',
-        password: '',
         realName: '',
         status: null,
         age: null,
@@ -60,10 +56,6 @@ export default ({
         ],
         realName: [
           { required: true, message: '请输入真实姓名', trigger: 'blur' }
-        ],
-        password: [
-          { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 6, max: 15, message: '密码长度在6~15个字符', trigger: 'blur' }
         ],
         age: [
           { pattern: /^[0-9]*$/, message: '年龄必须是数字' }

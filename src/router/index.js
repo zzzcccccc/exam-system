@@ -3,6 +3,8 @@ import VueRouter from 'vue-router'
 import Layout from '../layout/layout.vue'
 import Index from '../views/login/index.vue'
 import Profile from '../profile/info.vue'
+import ProfileInstall from '../profile/install.vue'
+
 import Welcome from '../components/welcome.vue'
 import AddUser from '../views/user/addUser.vue'
 import EditUser from '../views/user/editUser.vue'
@@ -26,6 +28,7 @@ import EditPaper from '../views/paper/editPaper.vue'
 import CorrectPaper from '../views/paper/correct.vue'
 import AnswerPaper from '../views/paper/answer.vue'
 
+
 import Test from '../views/paper/test.vue'
 
 import store from '../store'
@@ -46,6 +49,17 @@ const routes = [
       {
         path: '/profile/info',
         component: Profile
+      }
+    ]
+
+  },
+  {
+    path: '/profile/install',
+    component: Layout,
+    children: [
+      {
+        path: '/profile/install',
+        component: ProfileInstall
       }
     ]
 
